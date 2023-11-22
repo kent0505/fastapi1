@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+pyjwt
+bcrypt
+aiosqlite
+jinja2
+python-multipart
