@@ -2,38 +2,29 @@ import aiosqlite
 
 async def create_tables():
     async with aiosqlite.connect("test.db") as db:
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id       INTEGER PRIMARY KEY,
-                username TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        ''')
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS categories (
-                id    INTEGER PRIMARY KEY,
-                title TEXT NOT NULL
-            )
-        ''')
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS blogs (
-                id          INTEGER PRIMARY KEY,
-                title       TEXT NOT NULL,
-                category_id INTEGER
-            )
-        ''')
-        await db.execute('''
-            CREATE TABLE IF NOT EXISTS contents (
-                id      INTEGER PRIMARY KEY,
-                title   TEXT,
-                image   INTEGER,
-                blog_id INTEGER
-            )
-        ''')
+        await db.execute('''CREATE TABLE IF NOT EXISTS users (
+            id       INTEGER PRIMARY KEY,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL
+        )''')
+        await db.execute('''CREATE TABLE IF NOT EXISTS categories (
+            id    INTEGER PRIMARY KEY,
+            title TEXT NOT NULL
+        )''')
+        await db.execute('''CREATE TABLE IF NOT EXISTS blogs (
+            id          INTEGER PRIMARY KEY,
+            title       TEXT NOT NULL,
+            category_id INTEGER
+        )''')
+        await db.execute('''CREATE TABLE IF NOT EXISTS contents (
+            id      INTEGER PRIMARY KEY,
+            title   TEXT,
+            image   INTEGER,
+            blog_id INTEGER
+        )''')
         await db.commit()
 
 # USER
-
 async def get_username(username: str):
     async with aiosqlite.connect("test.db") as db:
         cur = await db.execute("SELECT * FROM users WHERE username = ?", (username,))
@@ -67,13 +58,7 @@ async def delete_user(id: int):
         await db.execute("DELETE FROM users WHERE id =?", (id,))
         await db.commit()
 
-async def delete_users():
-    async with aiosqlite.connect("test.db") as db:
-        await db.execute("DELETE FROM users")
-        await db.commit()
-
 # CATEGORY
-
 async def get_category(id: int):
     async with aiosqlite.connect("test.db") as db:
         curr =     await db.execute("SELECT * FROM categories WHERE id = ?", (id,))
@@ -99,12 +84,9 @@ async def update_category(id: int, title: str):
 async def delete_category(id: int):
     async with aiosqlite.connect("test.db") as db:
         await db.execute("DELETE FROM categories WHERE id = ?", (id,))
-        await db.execute("DELETE FROM blogs WHERE category_id = ?", (id,))
-        await db.execute("DELETE FROM contents WHERE blog_id = ?", (id,))
         await db.commit()
 
 # BLOG
-
 async def get_blog(blog_id: int):
     async with aiosqlite.connect("test.db") as db:
         curr = await db.execute("SELECT * FROM blogs WHERE id = ?", (blog_id,))
@@ -134,7 +116,6 @@ async def delete_blog(id: int):
         await db.commit()
 
 # CONTENT
-
 async def get_content(id: int):
     async with aiosqlite.connect("test.db") as db:
         curr =    await db.execute("SELECT * FROM contents WHERE id = ?", (id,))
@@ -161,18 +142,3 @@ async def delete_content(id: int):
     async with aiosqlite.connect("test.db") as db:
         await db.execute("DELETE FROM contents WHERE id = ?", (id,))
         await db.commit()
-
-# # IMAGE
-
-# async def add_image(filename: str, blog_id: int):
-#     async with aiosqlite.connect("test.db") as db:
-#         await db.execute("INSERT INTO contents (title, blog_id) VALUES (?, ?)", (filename, blog_id))
-#         await db.commit()
-
-# async def update_image(image: str, id: int):
-#     async with aiosqlite.connect("test.db") as db:
-#         curr =    await db.execute("SELECT * FROM contents WHERE id = ?", (id,))
-#         content = await curr.fetchone()
-#         await db.execute("UPDATE contents SET image = ? WHERE id = ?", (image, id))
-#         await db.commit()
-#     return content

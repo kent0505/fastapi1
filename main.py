@@ -8,6 +8,7 @@ from routes.blog     import router as blog_router
 from routes.content  import router as content_router
 from routes.image    import router as image_router
 import database as DB
+import uvicorn
 import os
 
 os.makedirs("static", exist_ok=True)
@@ -40,3 +41,11 @@ async def home(request: Request):
             "name":    name,
             "surname": surname,
         })
+    
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+
+# cd desktop/backend/fastapi/test2 & py main.py
+# uvicorn main:app --reload
+# pip install -r requirements.txt
+# venv\scripts\activate
