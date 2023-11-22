@@ -9,7 +9,9 @@ from routes.content  import router as content_router
 from routes.image    import router as image_router
 import database as DB
 import uvicorn
+import os
 
+os.makedirs("static", exist_ok=True)
 templates = Jinja2Templates(directory="templates")
 
 app = FastAPI()
