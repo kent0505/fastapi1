@@ -6,9 +6,6 @@ import os
 
 router = APIRouter()
 
-class Body(BaseModel):
-    title: str
-
 class ContentAdd(BaseModel):
     title:   str
     blog_id: int

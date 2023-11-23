@@ -1,20 +1,23 @@
 import time
 import jwt
-
-key = "hfasdg7SDF6gFGsgdf4"
+import config
 
 def signJWT(id: str):
+    expiry = time.time() + 60 * 60 * config.expiry
+
     return jwt.encode(
-        payload={"id": id, "expiry": time.time() + 60 * 60 * 24}, 
-        key=key,
-        algorithm="HS256",
+        payload={"id": id, "expiry": expiry}, 
+        key=config.key,
+        algorithm=config.algorithm,
     )
 
 def decodeJWT(token: str):
     try:
-        decoded_token = jwt.decode(jwt=token, key=key, algorithms=["HS256"])
-        print(decoded_token)
-        print(time.time())
+        decoded_token = jwt.decode(
+            jwt=token, 
+            key=config.key, 
+            algorithms=[config.algorithm]
+        )
         if decoded_token["expiry"] >= time.time():
             return decoded_token
         else: 

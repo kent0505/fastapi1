@@ -3,16 +3,20 @@ from pydantic         import BaseModel
 from auth.jwt_bearer  import JwtBearer
 from auth.jwt_handler import signJWT
 import database as DB
+import config
 import bcrypt
 
 router = APIRouter()
 
 class User(BaseModel):
-    username: str
-    password: str
+    username:       str
+    password:       str
+    admin_password: str
 
 @router.post("/register")
 async def register(user: User):
+    if user.admin_password != config.password:
+        raise HTTPException(409, "admin password incorrect")
     username = await DB.get_username(user.username)
     if username:
         raise HTTPException(409, "this username already exists")
@@ -48,7 +52,7 @@ async def update_user(user: User, id: int):
         raise HTTPException(404, "user not found")
     hashed = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode()
     await DB.update_user(user.username, hashed, id)
-    return {"message": f"id {id} updated from '{row[1], row[2]}' to '{user.username, user.password}'"}
+    return {"message": "user updated"}
     
 @router.delete("/{id}", dependencies=[Depends(JwtBearer())])
 async def delete_user(id: int):
@@ -56,4 +60,4 @@ async def delete_user(id: int):
     if not row:
         raise HTTPException(404, "user not found")
     await DB.delete_user(id)
-    return {"message": f"id {id} deleted"}
+    return {"message": "user deleted"}
