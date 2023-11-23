@@ -30,8 +30,8 @@ app.include_router(blog_router,     prefix="/api/blog",     tags=["Blog"])
 app.include_router(content_router,  prefix="/api/content",  tags=["Content"])
 app.include_router(image_router,    prefix="/api/upload",   tags=["Image"])
     
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
 
 # cd desktop/backend/fastapi/test2 & venv\scripts\activate
 # uvicorn main:app --reload
