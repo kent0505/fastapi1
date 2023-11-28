@@ -1,9 +1,8 @@
 fastapi
 uvicorn
+sqlalchemy
 pyjwt
 bcrypt
 jinja2
 python-multipart
 gunicorn
-sqlalchemy
-markdown
