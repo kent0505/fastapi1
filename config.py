@@ -1,19 +1,8 @@
-url = "https://rechela.uz"
-docs_url =  "/api/v1/docs"
-name =      "Otabek"
-surname =   "Yusupov"
-password =  "111" # admin password
-key =       "hfasdg7SDF6gFGsgdf4" # jwt secret key
+origins =   ["", ""]
+url =       ""
+docs_url =  ""
+password =  "" # admin password
+key =       "" # jwt secret key
 algorithm = "HS256" # jwt algorithm
 expiry =    24 # jwt expiry in hours
-origins =   ["https://rechela.uz", "https://www.rechela.uz"]
 
-url = "https://rechela.uz"
-docs_url =  "/api/v1/docs"
-name =      "Otabek"
-surname =   "Yusupov"
-password =  "111" # admin password
-key =       "hfasdg7SDF6gFGsgdf4" # jwt secret key
-algorithm = "HS256" # jwt algorithm
-expiry =    24 # jwt expiry in hours
-origins =   ["https://rechela.uz", "https://www.rechela.uz"]
