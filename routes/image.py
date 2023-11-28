@@ -1,56 +1,56 @@
 from fastapi         import APIRouter, UploadFile, HTTPException, Form, Depends
-from datetime        import datetime
 from auth.jwt_bearer import JwtBearer
-import database as DB
+from sqlalchemy.orm  import Session
+from database        import *
+import time
 import os
 
 router = APIRouter()
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
-async def upload_file(file: UploadFile, blog_id: str = Form()):
+async def upload_file(file: UploadFile, blog_id: str = Form(), db: Session = Depends(get_db)):
     if not file.filename:
         raise HTTPException(400, "file not found")
+    
     if not file.content_type.startswith("image/"):
         raise HTTPException(400, "only image files are allowed")
+
+    row = db.query(Blog).filter(Blog.id == blog_id).first()
+
+    if row:
+        unique_filename = f"{int(time.time())}.{file.filename.split(".")[-1]}"
+        file_name =       os.path.join("static", unique_filename)
+
+        with open(file_name, "wb") as image_file:
+            image_file.write(file.file.read())
         
-    blog = await DB.get_blog(blog_id)
-    if not blog:
-        raise HTTPException(404, "id not found")
-        
-    timestamp =       int(datetime.now().timestamp())
-    file_extension =  file.filename.split(".")[-1]
-    unique_filename = f"{timestamp}.{file_extension}"
-    file_name =       os.path.join("static", unique_filename)
+        db.add(Content(title=unique_filename, image=1, blog_id=blog_id))
+        db.commit()
 
-    with open(file_name, "wb") as image_file:
-        image_file.write(file.file.read())
+        return {"message": "image uploaded successfully"}
 
-    await DB.add_content(unique_filename, 1, blog_id)
+    raise HTTPException(404, "id not found")
 
-    return {"message": "image uploaded successfully"}
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
-async def update_file(file: UploadFile, id: str = Form()):
-    image = await DB.get_content(id)
-    if not image or image[2] == 0:
-        raise HTTPException(404, "id not found")
-        
-    timestamp =       int(datetime.now().timestamp())
-    file_extension =  file.filename.split(".")[-1]
-    unique_filename = f"{timestamp}.{file_extension}"
-    file_name =       os.path.join("static", unique_filename)
+async def update_file(file: UploadFile, id: str = Form(), db: Session = Depends(get_db)):
+    row = db.query(Content).filter(Content.id == id).first()
 
-    with open(file_name, "wb") as image_file:
-        image_file.write(file.file.read())
+    if row and row.image == 1:
+        try:
+            os.remove(f"static/{row.title}")
+        except:
+            print("not found")
 
-    await DB.update_content(id, unique_filename)
-    try:
-        os.remove(f"static/{image[1]}")
-    except:
-        print("not found")
+        unique_filename = f"{int(time.time())}.{file.filename.split(".")[-1]}"
+        file_name =       os.path.join("static", unique_filename)
 
-    return {"message": "image updated successfully"}
-    
+        with open(file_name, "wb") as image_file:
+            image_file.write(file.file.read())
 
-# background_tasks: BackgroundTasks, 
-# background_tasks.add_task(ImageController.save_image, file, blog_id)
+        row.title = unique_filename
+        db.commit()
+
+        return {"message": "image updated successfully"}
+
+    raise HTTPException(404, "id not found")

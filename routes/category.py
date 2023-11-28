@@ -1,7 +1,8 @@
 from fastapi         import APIRouter, HTTPException, Depends
 from pydantic        import BaseModel
 from auth.jwt_bearer import JwtBearer
-import database as DB
+from sqlalchemy.orm  import Session
+from database        import *
 
 router = APIRouter()
 
@@ -15,34 +16,51 @@ class CategoryUpdate(BaseModel):
 class CategoryDelete(BaseModel):
     id: int
 
+
 @router.get("/")
-async def get_categories():
+async def get_categories(db: Session = Depends(get_db)):
     categoriesList = []
-    categories = await DB.get_categories()
+
+    categories = db.query(Category).all()
+
     for category in categories:
         categoriesList.append({
-            "id":    category[0],
-            "title": category[1],
+            "id":    category.id,
+            "title": category.title,
         })
+
     return {"category": categoriesList}
 
-@router.post("/", dependencies=[Depends(JwtBearer())])
-async def add_category(category: CategoryAdd):
-    await DB.add_category(category.title)
-    return {"category": category}
-    
+
+@router.post("/")
+async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
+    db.add(Category(title=category.title))
+    db.commit()
+
+    return {"message": "category added"}
+
+
 @router.put("/", dependencies=[Depends(JwtBearer())])
-async def update_category(category: CategoryUpdate):
-    row = await DB.get_category(category.id)
-    if not row:
-        raise HTTPException(404, "id not found")
-    await DB.update_category(category.id, category.title)
-    return {"category": "category updated"}
-    
+async def update_category(category: CategoryUpdate, db: Session = Depends(get_db)):
+    row = db.query(Category).filter(Category.id == category.id).first()
+
+    if row:
+        row.title = category.title
+        db.commit()
+
+        return {"message": "category updated"}
+
+    raise HTTPException(404, "id not found")
+
+
 @router.delete("/", dependencies=[Depends(JwtBearer())])
-async def delete_category(category: CategoryDelete):
-    row = await DB.get_category(category.id)
-    if not row:
-        raise HTTPException(404, "id not found")
-    await DB.delete_category(category.id)
-    return {"category": "category deleted"}
+async def delete_category(category: CategoryDelete, db: Session = Depends(get_db)):
+    row = db.query(Category).filter(Category.id == category.id).first()
+
+    if row:
+        db.delete(row)
+        db.commit()
+
+        return {"message": "category deleted"}
+    
+    raise HTTPException(404, "id not found")

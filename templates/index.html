@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <link rel="icon" type="image/png" href="/templates/icon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <style>
+        body {
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+        .container {
+            max-width: 700px; 
+            width: 100%; 
+            box-sizing: border-box; 
+            white-space: nowrap;
+        }
+        ul {
+            list-style-type: none; 
+            padding-inline-start: 0;
+        }
+        img {
+            height: auto; 
+            max-width: 100%;
+        }
+        #markdown {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ title }}</h1>
+        
+        <ul>
+            {% if index == 1 %}
+
+                {% for category in categories %}
+                    <li><a href="{{ category.title }}">{{ category.title }}</a></li>
+                {% endfor %}
+    
+            {% elif index == 2 %}
+
+                {% for blog in blogs %}
+                    <li><a href="{{ title }}/{{ blog.title }}">{{ blog.title }}</a></li>
+                {% endfor %}
+
+            {% endif %}
+        </ul>
+
+        {% if index == 3 %}
+            <div id="markdown"></div>
+        {% endif %}
+    </div>
+    <script>
+        var converter = new showdown.Converter();
+        var html = converter.makeHtml(`{{ markdown }}`);
+        document.getElementById('markdown').innerHTML = html;
+    </script>
+</body>
+</html>
