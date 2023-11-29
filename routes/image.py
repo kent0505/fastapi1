@@ -18,7 +18,7 @@ async def upload_file(file: UploadFile, blog_id: str = Form(), db: Session = Dep
     row = db.query(Blog).filter(Blog.id == blog_id).first()
 
     if row:
-        unique_filename = f"{int(time.time())}.{file.filename.split(".")[-1]}"
+        unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
         file_name =       os.path.join("static", unique_filename)
 
         with open(file_name, "wb") as image_file:
@@ -42,7 +42,7 @@ async def update_file(file: UploadFile, id: str = Form(), db: Session = Depends(
         except:
             print("not found")
 
-        unique_filename = f"{int(time.time())}.{file.filename.split(".")[-1]}"
+        unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
         file_name =       os.path.join("static", unique_filename)
 
         with open(file_name, "wb") as image_file:

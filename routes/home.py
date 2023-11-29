@@ -19,12 +19,15 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
         "request":    request,
         "title":      "Categories",
         "index":      1,
+        "url":        config.url,
         "categories": categories,
     })
 
 
 @router.get("/{category}")
 async def blogs_page(request: Request, category: str, db: Session = Depends(get_db)):
+    category = category.replace("-", " ")
+
     blogs = []
 
     row = db.query(Category).filter(Category.title == category).first()
@@ -36,6 +39,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "request": request,
             "title":   category,
             "index":   2,
+            "url":     config.url,
             "blogs":   blogs,
         })
 
@@ -44,6 +48,9 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
 
 @router.get("/{category}/{blog}")
 async def blogs_page(request: Request, category: str, blog: str, db: Session = Depends(get_db)):
+    category = category.replace("-", " ")
+    blog = blog.replace("-", " ")
+
     contents = []
     text = ""
 
@@ -52,6 +59,8 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
 
     if db_category and db_blog:
         contents = db.query(Content).filter(Content.blog_id == db_blog.id).all()
+
+        text += f"## {blog}\n\n"
 
         for content in contents:
             if content.image == 0:
@@ -65,6 +74,7 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
             "request": request,
             "title":   blog,
             "index":   3,
+            "url":     config.url,
             "data":    data,
         })
 

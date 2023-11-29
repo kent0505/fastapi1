@@ -1,0 +1,51 @@
+body {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    margin: 0;
+}
+.container {
+    max-width: 700px; 
+    width: 100%; 
+    box-sizing: border-box; 
+    overflow-wrap: break-word;
+    margin-top: 0;
+}
+a, a:visited {
+    color: #000;
+}
+ul {
+    list-style-type: none; 
+    padding-inline-start: 0;
+    margin: 10px;
+}
+img {
+    height: auto; 
+    max-width: 100%;
+}
+#pythonTextContainer {
+    font-size: 20px;
+    margin: 10px;
+}
+code {
+    background-color: bisque;
+}
+.navbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+    top: 0;
+    width: 700px;
+}
+.navbar li {
+    float: left;
+}
+.navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}

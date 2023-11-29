@@ -2,56 +2,31 @@
 <html>
 <head>
     <title>{{ title }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="/templates/icon.png" />
-    <style>
-        body {
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
-        .container {
-            max-width: 700px; 
-            width: 100%; 
-            box-sizing: border-box; 
-            white-space: nowrap;
-        }
-        ul {
-            list-style-type: none; 
-            padding-inline-start: 0;
-        }
-        img {
-            height: auto; 
-            max-width: 100%;
-        }
-        #pythonTextContainer {
-            font-size: 20px;
-        }
-        code {
-            background-color: bisque;
-        }
-    </style>
+    <link rel="stylesheet" href="/templates/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>{{ title }}</h1>
+        <div class="navbar">
+            <ul>
+                <li><a class="active" href="{{ url }}">Home</a></li>
+            </ul>
+        </div>
 
-        <ul>
-            {% if index == 1 %}
-
+        {% if index == 1 %}
+            <ul>
                 {% for category in categories %}
-                    <li><a href="{{ category.title }}">{{ category.title }}</a></li>
+                    <li><a href="{{ category.title.replace(' ', '-') }}">{{ category.title }}</a></li>
                 {% endfor %}
-    
-            {% elif index == 2 %}
-
+            </ul>
+        {% elif index == 2 %}
+            <ul>
                 {% for blog in blogs %}
-                    <li><a href="{{ title }}/{{ blog.title }}">{{ blog.title }}</a></li>
+                    <li><a href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
                 {% endfor %}
-
-            {% endif %}
-        </ul>
-
-        {% if index == 3 %}
+            </ul>
+        {% elif index == 3 %}
             <div id="pythonTextContainer"></div>
         {% endif %}
     </div>

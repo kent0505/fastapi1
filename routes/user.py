@@ -20,11 +20,14 @@ class UserRegisterModel(BaseModel):
 
 @router.post("/register")
 async def register(user: UserRegisterModel, db: Session = Depends(get_db)):
+    if user.admin_password != config.password:
+        raise HTTPException(409, "admin password incorrect")
+
     row = db.query(User).filter(User.username == user.username).first()
 
     if row:
         raise HTTPException(409, "this username already exists")
-    
+
     hashed = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode()
 
     db.add(User(username=user.username, password=hashed))
@@ -35,9 +38,6 @@ async def register(user: UserRegisterModel, db: Session = Depends(get_db)):
 
 @router.post("/login")
 async def login(user: UserModel, db: Session = Depends(get_db)):
-    if user.username and user.password == "admin":
-        return {"access_token": signJWT(user.username)}
-
     row = db.query(User).filter(User.username == user.username).first()
 
     if row:
@@ -77,7 +77,7 @@ async def update_user(user: UserModel, id: int, db: Session = Depends(get_db)):
         db.commit()
 
         return {"message": "user updated"}
-    
+
     raise HTTPException(404, "user not found")
 
 
