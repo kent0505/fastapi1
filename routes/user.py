@@ -20,9 +20,6 @@ class UserRegisterModel(BaseModel):
 
 @router.post("/register")
 async def register(user: UserRegisterModel, db: Session = Depends(get_db)):
-    if user.admin_password != config.password:
-        raise HTTPException(409, "admin password incorrect")
-    
     row = db.query(User).filter(User.username == user.username).first()
 
     if row:
