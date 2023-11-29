@@ -5,4 +5,5 @@ pyjwt
 bcrypt
 jinja2
 python-multipart
+markdown
 gunicorn
