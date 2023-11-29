@@ -11,7 +11,6 @@ from database                import *
 import config
 import os
 
-
 os.makedirs("static", exist_ok=True)
 
 Base.metadata.create_all(bind=engine)
@@ -44,9 +43,3 @@ app.include_router(category_router, prefix="/api/v1/category", tags=["Category"]
 app.include_router(blog_router,     prefix="/api/v1/blog",     tags=["Blog"])
 app.include_router(content_router,  prefix="/api/v1/content",  tags=["Content"])
 app.include_router(image_router,    prefix="/api/v1/upload",   tags=["Image"])
-
-
-# cd desktop/backend/fastapi/test2 & venv\scripts\activate
-# uvicorn main:app --reload
-# pip install -r requirements.txt
-# venv\scripts\activate

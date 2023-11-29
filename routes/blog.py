@@ -43,7 +43,7 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
         db.add(Blog(title=blog.title, category_id=blog.category_id))
         db.commit()
 
-        return {"blog": blog}
+        return {"message": "blog added"}
     
     raise HTTPException(404, "id not found")
 

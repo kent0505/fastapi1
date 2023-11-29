@@ -3,9 +3,11 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm     import Session
 from database           import *
 import config
+import markdown
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
 
 @router.get("/")
 async def home_page(request: Request, db: Session = Depends(get_db)):
@@ -43,7 +45,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
 @router.get("/{category}/{blog}")
 async def blogs_page(request: Request, category: str, blog: str, db: Session = Depends(get_db)):
     contents = []
-    markdown = ""
+    text = ""
 
     db_category = db.query(Category).filter(Category.title == category).first()
     db_blog =     db.query(Blog).filter(Blog.title == blog).first()
@@ -53,18 +55,17 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
 
         for content in contents:
             if content.image == 0:
-                markdown += f"{content.title}\n\n"
+                text += f"{content.title}\n\n"
             else:
-                markdown += f"![image info]({config.url}/images/{content.title})\n\n"
+                text += f"![]({config.url}/images/{content.title})\n\n"
 
-        print(markdown)
+        data = markdown.markdown(text)
 
         return templates.TemplateResponse("index.html", {
-            "request":  request,
-            "title":    blog,
-            "index":    3,
-            "contents": contents,
-            "markdown": markdown
+            "request": request,
+            "title":   blog,
+            "index":   3,
+            "data":    data,
         })
 
     raise HTTPException(404, "Not found")
