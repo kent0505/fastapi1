@@ -19,7 +19,7 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
         "request":    request,
         "title":      "Categories",
         "index":      1,
-        "url":        config.url,
+        "url":        config.URL,
         "categories": categories,
     })
 
@@ -39,7 +39,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "request": request,
             "title":   category,
             "index":   2,
-            "url":     config.url,
+            "url":     config.URL,
             "blogs":   blogs,
         })
 
@@ -66,7 +66,7 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
             if content.image == 0:
                 text += f"{content.title}\n\n"
             else:
-                text += f"![]({config.url}/images/{content.title})\n\n"
+                text += f"![]({config.URL}/images/{content.title})\n\n"
 
         data = markdown.markdown(text)
 
@@ -74,7 +74,7 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
             "request": request,
             "title":   blog,
             "index":   3,
-            "url":     config.url,
+            "url":     config.URL,
             "data":    data,
         })
 

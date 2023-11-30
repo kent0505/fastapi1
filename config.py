@@ -1,7 +1,13 @@
-origins =   ["https://yourdomain.com", "https://www.yourdomain.com"] # allowed hosts
-url =       "https://yourdomain.com"
-docs_url =  "/docs" # url for swagger
-password =  "123" # admin password
-key =       "fhasd4h3uRhewirASDrwjh34iorSssf45" # jwt secret key
-algorithm = "HS256" # jwt algorithm
-expiry =    24 # jwt expiry in hours
+DB_HOST=""
+DB_PORT="5432"
+DB_USER=""
+DB_PASS=""
+DB_NAME=""
+
+ORIGINS =   ["https://youdomain.com", "https://www.youdomain.com"]
+URL =      "https://youdomain.com"
+DOCS_URL =  "/docs" # swagger url
+PASSWORD =  "111" # admin password
+KEY =       "hfasdg7SDF6gFGsgdf4" # jwt secret key
+ALGORITHM = "HS256" # jwt algorithm
+EXPIRY =    24 # jwt expiry in hours

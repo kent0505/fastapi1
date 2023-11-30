@@ -15,27 +15,16 @@ os.makedirs("static", exist_ok=True)
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    docs_url=config.docs_url, 
-    redoc_url=None
-)
-app.mount(
-    path="/images", 
-    app=StaticFiles(directory="static"), 
-    name="static"
-)
-app.mount(
-    path="/templates", 
-    app=StaticFiles(directory="templates"), 
-    name="templates"
-)
+app = FastAPI(docs_url=config.DOCS_URL, redoc_url=None)
 app.add_middleware(
     middleware_class=CORSMiddleware,
-    allow_origins=config.origins,
+    allow_origins=config.ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
+app.mount(path="/images",    app=StaticFiles(directory="static"),    name="static")
+app.mount(path="/templates", app=StaticFiles(directory="templates"), name="templates")
 
 app.include_router(home_router,     prefix="",                 tags=["Home"])
 app.include_router(user_router,     prefix="/api/v1/user",     tags=["Users"])

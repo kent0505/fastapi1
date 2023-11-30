@@ -10,6 +10,7 @@ body {
     box-sizing: border-box; 
     overflow-wrap: break-word;
     margin-top: 0;
+    overflow: hidden;
 }
 a, a:visited {
     color: #000;

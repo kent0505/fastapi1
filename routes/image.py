@@ -8,7 +8,7 @@ import os
 router = APIRouter()
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
-async def upload_file(file: UploadFile, blog_id: str = Form(), db: Session = Depends(get_db)):
+async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Depends(get_db)):
     if not file.filename:
         raise HTTPException(400, "file not found")
     
@@ -33,7 +33,7 @@ async def upload_file(file: UploadFile, blog_id: str = Form(), db: Session = Dep
 
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
-async def update_file(file: UploadFile, id: str = Form(), db: Session = Depends(get_db)):
+async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(get_db)):
     row = db.query(Content).filter(Content.id == id).first()
 
     if row and row.image == 1:
