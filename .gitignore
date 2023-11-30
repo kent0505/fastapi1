@@ -1,6 +1,4 @@
 __pycache__/
 images/
 venv/
-test.db
-test.py
 static/*
