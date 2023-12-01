@@ -1,6 +1,7 @@
 from fastapi            import APIRouter, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm     import Session
+from sqlalchemy         import desc
 from database           import *
 import config
 import markdown
@@ -13,14 +14,14 @@ templates = Jinja2Templates(directory="templates")
 async def home_page(request: Request, db: Session = Depends(get_db)):
     categories = []
 
-    categories = db.query(Category).all()
+    categories = db.query(Category).order_by(desc(Category.index)).all()
 
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "title":      "Categories",
         "index":      1,
         "url":        config.URL,
-        "categories": categories,
+        "categories": categories
     })
 
 
@@ -33,14 +34,14 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
     row = db.query(Category).filter(Category.title == category).first()
 
     if row:
-        blogs = db.query(Blog).filter(Blog.category_id == row.id).all()
+        blogs = db.query(Blog).filter(Blog.category_id == row.id).order_by(desc(Blog.index)).all()
 
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
             "index":   2,
             "url":     config.URL,
-            "blogs":   blogs,
+            "blogs":   blogs
         })
 
     raise HTTPException(404, "Not found")

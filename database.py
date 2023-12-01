@@ -1,15 +1,18 @@
 from sqlalchemy import  create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import config
+# import config
 
-SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+
+# SQLALCHEMY_DATABASE_URL = f"postgresql+psycopg://{config.DB_USER}:{config.DB_PASS}@{config.DB_HOST}:{config.DB_PORT}/{config.DB_NAME}"
+# engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id =       Column(Integer, primary_key=True, index=True)
     username = Column(String,  nullable=False)
     password = Column(String,  nullable=False)
@@ -18,11 +21,14 @@ class Category(Base):
     __tablename__ = "categories"
     id =    Column(Integer, primary_key=True, index=True)
     title = Column(String,  nullable=False)
+    index = Column(Integer, nullable=False)
+    type =  Column(Integer, nullable=False)
 
 class Blog(Base):
     __tablename__ = "blogs"
     id =          Column(Integer, primary_key=True, index=True)
     title =       Column(String,  nullable=False)
+    index =       Column(Integer, nullable=False)
     category_id = Column(Integer, nullable=False)
 
 class Content(Base):

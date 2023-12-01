@@ -8,11 +8,13 @@ router = APIRouter()
 
 class BlogAdd(BaseModel):
     title:       str
+    index:       int
     category_id: int
 
 class BlogUpdate(BaseModel):
     id:          int
     title:       str
+    index:       int
     category_id: int
 
 class BlogDelete(BaseModel):
@@ -23,7 +25,7 @@ class BlogDelete(BaseModel):
 async def get_blogs(db: Session = Depends(get_db)):
     blogList = []
 
-    blogs = db.query(Blog).all()
+    blogs = db.query(Blog).order_by(Blog.index).all()
 
     for blog in blogs:
         blogList.append({
@@ -37,10 +39,10 @@ async def get_blogs(db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
-    row = db.query(Category).filter(Category.id == blog.category_id).first()
+    row = db.query(Category).filter(Category.id == blog.category_id, Category.type == 0).first()
 
     if row:
-        db.add(Blog(title=blog.title, category_id=blog.category_id))
+        db.add(Blog(title=blog.title, index=blog.index, category_id=blog.category_id))
         db.commit()
 
         return {"message": "blog added"}
@@ -50,10 +52,11 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
-    row = db.query(Blog).filter(Blog.id == blog.id).first()
+    row = db.query(Blog).filter(Blog.id == blog.id, Category.type == 0).first()
 
     if row:
         row.title =       blog.title
+        row.index =       blog.id
         row.category_id = blog.category_id
         db.commit()
 

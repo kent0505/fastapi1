@@ -2,6 +2,7 @@ fastapi
 uvicorn
 sqlalchemy
 psycopg
+psycopg-binary
 pyjwt
 bcrypt
 jinja2

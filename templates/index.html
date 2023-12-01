@@ -13,17 +13,20 @@
                 <li><a class="active" href="{{ url }}">Home</a></li>
             </ul>
         </div>
-
         {% if index == 1 %}
             <ul>
                 {% for category in categories %}
-                    <li><a href="{{ category.title.replace(' ', '-') }}">{{ category.title }}</a></li>
+                    {% if category.type == 0 %}
+                        <li id="li-category"><a href="{{ category.title.replace(' ', '-') }}">{{ category.title }}</a></li>
+                    {% else %}
+                        <p id="p-category">{{ category.title }}</p>
+                    {% endif %}
                 {% endfor %}
             </ul>
         {% elif index == 2 %}
             <ul>
                 {% for blog in blogs %}
-                    <li><a href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
+                    <li id="li-category"><a href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
                 {% endfor %}
             </ul>
         {% elif index == 3 %}
@@ -33,7 +36,9 @@
     <script>
         const pythonText = `{{ data | safe }}`;
         const container = document.getElementById("pythonTextContainer");
-        container.innerHTML = pythonText;
+        if (pythonText) {
+            container.innerHTML = pythonText; 
+        }
     </script>
 </body>
 </html>

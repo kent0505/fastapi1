@@ -24,6 +24,14 @@ img {
     height: auto; 
     max-width: 100%;
 }
+/* #li-category {
+    margin-left: 20px;
+} */
+#p-category {
+    margin: 8px 0 8px 0;
+    color: slategray;
+    font-size: 24px;
+}
 #pythonTextContainer {
     font-size: 20px;
     margin: 10px;

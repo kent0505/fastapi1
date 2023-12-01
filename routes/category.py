@@ -2,16 +2,21 @@ from fastapi         import APIRouter, HTTPException, Depends
 from pydantic        import BaseModel
 from auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm  import Session
+from sqlalchemy      import desc
 from database        import *
 
 router = APIRouter()
 
 class CategoryAdd(BaseModel):
     title: str
+    index: int
+    type:  int
 
 class CategoryUpdate(BaseModel):
     id:    int
     title: str
+    index: int
+    type:  int
 
 class CategoryDelete(BaseModel):
     id: int
@@ -21,12 +26,14 @@ class CategoryDelete(BaseModel):
 async def get_categories(db: Session = Depends(get_db)):
     categoriesList = []
 
-    categories = db.query(Category).all()
+    categories = db.query(Category).order_by(desc(Category.index)).all()
 
     for category in categories:
         categoriesList.append({
             "id":    category.id,
             "title": category.title,
+            "index": category.index,
+            "type":  category.type
         })
 
     return {"category": categoriesList}
@@ -34,7 +41,7 @@ async def get_categories(db: Session = Depends(get_db)):
 
 @router.post("/")
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
-    db.add(Category(title=category.title))
+    db.add(Category(title=category.title, index=0, type=category.type))
     db.commit()
 
     return {"message": "category added"}
@@ -46,6 +53,8 @@ async def update_category(category: CategoryUpdate, db: Session = Depends(get_db
 
     if row:
         row.title = category.title
+        row.index = category.index
+        row.type =  category.type
         db.commit()
 
         return {"message": "category updated"}
