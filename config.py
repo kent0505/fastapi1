@@ -4,9 +4,11 @@ DB_USER=""
 DB_PASS=""
 DB_NAME=""
 
-ORIGINS =   ["https://youdomain.com", "https://www.youdomain.com"]
-URL =      "https://youdomain.com"
+HOST =      "localhost:8000" # change this to your domain
+URL =       f"http://{HOST}" # change http to https
+ORIGINS =   [f"https://{HOST}", f"https://www.{HOST}"]
 DOCS_URL =  "/docs" # swagger url
+USERNAME =  "admin" # admin username
 PASSWORD =  "111" # admin password
 KEY =       "" # jwt secret key
 ALGORITHM = "HS256" # jwt algorithm

@@ -1,13 +1,13 @@
 from fastapi         import APIRouter, UploadFile, HTTPException, Form, Depends
-from auth.jwt_bearer import JwtBearer
+from app.auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm  import Session
 from database        import *
 import time
 import os
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(JwtBearer())])
 
-@router.post("/", dependencies=[Depends(JwtBearer())])
+@router.post("/")
 async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Depends(get_db)):
     if not file.filename:
         raise HTTPException(400, "file not found")
@@ -32,7 +32,7 @@ async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Dep
     raise HTTPException(404, "id not found")
 
 
-@router.put("/", dependencies=[Depends(JwtBearer())])
+@router.put("/")
 async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(get_db)):
     row = db.query(Content).filter(Content.id == id).first()
 

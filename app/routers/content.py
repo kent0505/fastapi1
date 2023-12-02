@@ -1,6 +1,6 @@
 from fastapi         import APIRouter, HTTPException, Depends
 from pydantic        import BaseModel
-from auth.jwt_bearer import JwtBearer
+from app.auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm  import Session
 from database        import *
 import os

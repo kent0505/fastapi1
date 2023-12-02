@@ -58,3 +58,8 @@ code {
     padding: 14px 16px;
     text-decoration: none;
 }
+.navbar ul li img {
+    height: 30px;
+    width: 30px;
+    margin: 8px -8px 0 8px;
+}

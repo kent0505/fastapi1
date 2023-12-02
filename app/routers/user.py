@@ -1,7 +1,7 @@
 from fastapi          import APIRouter, HTTPException, Depends
 from pydantic         import BaseModel
-from auth.jwt_bearer  import JwtBearer
-from auth.jwt_handler import signJWT
+from app.auth.jwt_bearer  import JwtBearer, UserJwtBearer
+from app.auth.jwt_handler import signJWT
 from sqlalchemy.orm   import Session
 from database         import *
 import bcrypt
@@ -13,16 +13,17 @@ class UserModel(BaseModel):
     username: str
     password: str
 
-class UserRegisterModel(BaseModel):
-    username:       str
-    password:       str
-    admin_password: str
+class UserUpdateModel(BaseModel):
+    id:       int
+    username: str
+    password: str
+
 
 @router.post("/register")
-async def register(user: UserRegisterModel, db: Session = Depends(get_db)):
+async def register(user: UserModel, db: Session = Depends(get_db)):
     row = db.query(User).filter(User.username == user.username).first()
 
-    if row:
+    if row or user.username.lower() == "admin":
         raise HTTPException(409, "this username already exists")
 
     hashed = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode()
@@ -34,9 +35,9 @@ async def register(user: UserRegisterModel, db: Session = Depends(get_db)):
 
 
 @router.post("/login")
-async def login(user: UserModel, db: Session = Depends(get_db)):
-    if user.username and user.password == "admin":
-        return {"access_token": signJWT(user.username)}
+async def login(user: UserModel, db: Session = Depends(get_db)):    
+    if user.username.lower() == config.USERNAME and user.password == config.PASSWORD:
+        return {"access_token": signJWT(user.username, "admin")}
 
     row = db.query(User).filter(User.username == user.username).first()
 
@@ -44,12 +45,12 @@ async def login(user: UserModel, db: Session = Depends(get_db)):
         hashed = bcrypt.checkpw(user.password.encode("utf-8"), row.password.encode("utf-8"))
 
         if hashed and row.username == user.username:
-            return {"access_token": signJWT(user.username)}
+            return {"access_token": signJWT(user.username, "user")}
 
     raise HTTPException(401, "username or password invalid")
 
 
-@router.get("/", dependencies=[Depends(JwtBearer())])
+@router.get("/", dependencies=[Depends(UserJwtBearer())])
 async def get_users(db: Session = Depends(get_db)):
     usersList = []
 
@@ -65,11 +66,11 @@ async def get_users(db: Session = Depends(get_db)):
     return {"users": usersList}
 
 
-@router.put("/{id}", dependencies=[Depends(JwtBearer())])
-async def update_user(user: UserModel, id: int, db: Session = Depends(get_db)):
-    row = db.query(User).filter(User.id == id).first()
+@router.put("/", dependencies=[Depends(JwtBearer())])
+async def update_user(user: UserUpdateModel, db: Session = Depends(get_db)):
+    row = db.query(User).filter(User.id == user.id).first()
 
-    if row:
+    if row and user.username.lower() != "admin":
         hashed = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode()
 
         row.username = user.username
@@ -81,9 +82,9 @@ async def update_user(user: UserModel, id: int, db: Session = Depends(get_db)):
     raise HTTPException(404, "user not found")
 
 
-@router.delete("/{id}", dependencies=[Depends(JwtBearer())])
-async def delete_user(id: int, db: Session = Depends(get_db)):
-    row = db.query(User).filter(User.id == id).first()
+@router.delete("/", dependencies=[Depends(JwtBearer())])
+async def delete_user(user: UserUpdateModel, db: Session = Depends(get_db)):
+    row = db.query(User).filter(User.id == user.id).first()
 
     if row:
         db.delete(row)

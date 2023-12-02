@@ -10,6 +10,7 @@
     <div class="container">
         <div class="navbar">
             <ul>
+                <li><img src="/templates/icon.png" alt=""></li>
                 <li><a class="active" href="{{ url }}">Home</a></li>
             </ul>
         </div>
@@ -34,7 +35,7 @@
         {% endif %}
     </div>
     <script>
-        const pythonText = `{{ data | safe }}`;
+        const pythonText = `{{ contents | safe }}`;
         const container = document.getElementById("pythonTextContainer");
         if (pythonText) {
             container.innerHTML = pythonText; 

@@ -69,14 +69,12 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
             else:
                 text += f"![]({config.URL}/images/{content.title})\n\n"
 
-        data = markdown.markdown(text)
-
         return templates.TemplateResponse("index.html", {
-            "request": request,
-            "title":   blog,
-            "index":   3,
-            "url":     config.URL,
-            "data":    data,
+            "request":  request,
+            "title":    blog,
+            "index":    3,
+            "url":      config.URL,
+            "contents": markdown.markdown(text),
         })
 
     raise HTTPException(404, "Not found")

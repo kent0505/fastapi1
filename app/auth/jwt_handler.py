@@ -2,11 +2,11 @@ import time
 import jwt
 import config
 
-def signJWT(id: str):
+def signJWT(id: str, role: str):
     expiry = time.time() + 60 * 60 * config.EXPIRY
 
     return jwt.encode(
-        payload={"id": id, "expiry": expiry}, 
+        payload={"id": id, "role": role, "expiry": expiry}, 
         key=config.KEY,
         algorithm=config.ALGORITHM,
     )

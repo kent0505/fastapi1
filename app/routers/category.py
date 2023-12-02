@@ -1,6 +1,6 @@
 from fastapi         import APIRouter, HTTPException, Depends
 from pydantic        import BaseModel
-from auth.jwt_bearer import JwtBearer
+from app.auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm  import Session
 from sqlalchemy      import desc
 from database        import *
@@ -39,7 +39,7 @@ async def get_categories(db: Session = Depends(get_db)):
     return {"category": categoriesList}
 
 
-@router.post("/")
+@router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
     db.add(Category(title=category.title, index=0, type=category.type))
     db.commit()
