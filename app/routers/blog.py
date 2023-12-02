@@ -1,8 +1,8 @@
-from fastapi         import APIRouter, HTTPException, Depends
-from pydantic        import BaseModel
+from fastapi             import APIRouter, HTTPException, Depends
+from pydantic            import BaseModel
+from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
-from sqlalchemy.orm  import Session
-from database        import *
+from app.database        import *
 
 router = APIRouter()
 

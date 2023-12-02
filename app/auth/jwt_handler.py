@@ -1,22 +1,22 @@
 import time
 import jwt
-import config
+from app.config import *
 
 def signJWT(id: str, role: str):
-    expiry = time.time() + 60 * 60 * config.EXPIRY
+    expiry = time.time() + 60 * 60 * EXPIRY
 
     return jwt.encode(
         payload={"id": id, "role": role, "expiry": expiry}, 
-        key=config.KEY,
-        algorithm=config.ALGORITHM,
+        key=KEY,
+        algorithm=ALGORITHM,
     )
 
 def decodeJWT(token: str):
     try:
         decoded_token = jwt.decode(
             jwt=token, 
-            key=config.KEY, 
-            algorithms=[config.ALGORITHM]
+            key=KEY, 
+            algorithms=[ALGORITHM]
         )
         if decoded_token["expiry"] >= time.time():
             return decoded_token

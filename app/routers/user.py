@@ -1,11 +1,11 @@
-from fastapi          import APIRouter, HTTPException, Depends
-from pydantic         import BaseModel
+from fastapi              import APIRouter, HTTPException, Depends
+from pydantic             import BaseModel
+from sqlalchemy.orm       import Session
 from app.auth.jwt_bearer  import JwtBearer, UserJwtBearer
 from app.auth.jwt_handler import signJWT
-from sqlalchemy.orm   import Session
-from database         import *
+from app.config           import *
+from app.database         import *
 import bcrypt
-import config
 
 router = APIRouter()
 
@@ -36,7 +36,7 @@ async def register(user: UserModel, db: Session = Depends(get_db)):
 
 @router.post("/login")
 async def login(user: UserModel, db: Session = Depends(get_db)):    
-    if user.username.lower() == config.USERNAME and user.password == config.PASSWORD:
+    if user.username.lower() == USERNAME and user.password == PASSWORD:
         return {"access_token": signJWT(user.username, "admin")}
 
     row = db.query(User).filter(User.username == user.username).first()

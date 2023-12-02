@@ -1,7 +1,7 @@
-from fastapi         import APIRouter, UploadFile, HTTPException, Form, Depends
+from fastapi             import APIRouter, UploadFile, HTTPException, Form, Depends
 from app.auth.jwt_bearer import JwtBearer
-from sqlalchemy.orm  import Session
-from database        import *
+from sqlalchemy.orm      import Session
+from app.database        import *
 import time
 import os
 

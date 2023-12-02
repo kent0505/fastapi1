@@ -2,8 +2,8 @@ from fastapi            import APIRouter, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm     import Session
 from sqlalchemy         import desc
-from database           import *
-import config
+from app.database       import *
+from app.config         import *
 import markdown
 
 router = APIRouter()
@@ -20,7 +20,7 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
         "request":    request,
         "title":      "Categories",
         "index":      1,
-        "url":        config.URL,
+        "url":        URL,
         "categories": categories
     })
 
@@ -40,7 +40,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "request": request,
             "title":   category,
             "index":   2,
-            "url":     config.URL,
+            "url":     URL,
             "blogs":   blogs
         })
 
@@ -67,13 +67,13 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
             if content.image == 0:
                 text += f"{content.title}\n\n"
             else:
-                text += f"![]({config.URL}/images/{content.title})\n\n"
+                text += f"![]({URL}/images/{content.title})\n\n"
 
         return templates.TemplateResponse("index.html", {
             "request":  request,
             "title":    blog,
             "index":    3,
-            "url":      config.URL,
+            "url":      URL,
             "contents": markdown.markdown(text),
         })
 
