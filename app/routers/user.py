@@ -1,9 +1,9 @@
 from fastapi              import APIRouter, HTTPException, Depends
 from pydantic             import BaseModel
 from sqlalchemy.orm       import Session
-from app.auth.jwt_bearer  import JwtBearer, UserJwtBearer
+from app.auth.jwt_bearer  import JwtBearer
 from app.auth.jwt_handler import signJWT
-from app.config           import *
+from app.config           import USERNAME, PASSWORD
 from app.database         import *
 import bcrypt
 
@@ -28,7 +28,10 @@ async def register(user: UserModel, db: Session = Depends(get_db)):
 
     hashed = bcrypt.hashpw(user.password.encode("utf-8"), bcrypt.gensalt()).decode()
 
-    db.add(User(username=user.username, password=hashed))
+    db.add(User(
+        username=user.username, 
+        password=hashed
+    ))
     db.commit()
 
     return {"message": "user added"}
@@ -50,7 +53,7 @@ async def login(user: UserModel, db: Session = Depends(get_db)):
     raise HTTPException(401, "username or password invalid")
 
 
-@router.get("/", dependencies=[Depends(UserJwtBearer())])
+@router.get("/", dependencies=[Depends(JwtBearer())])
 async def get_users(db: Session = Depends(get_db)):
     usersList = []
 

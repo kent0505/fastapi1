@@ -19,12 +19,16 @@ async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Dep
 
     if row:
         unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
-        file_name =       os.path.join("static", unique_filename)
+        file_name = os.path.join("static", unique_filename)
 
         with open(file_name, "wb") as image_file:
             image_file.write(file.file.read())
         
-        db.add(Content(title=unique_filename, image=1, blog_id=blog_id))
+        db.add(Content(
+            title   = unique_filename, 
+            image   = 1, 
+            blog_id = blog_id
+        ))
         db.commit()
 
         return {"message": "image uploaded successfully"}
@@ -43,7 +47,7 @@ async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(
             print("not found")
 
         unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
-        file_name =       os.path.join("static", unique_filename)
+        file_name = os.path.join("static", unique_filename)
 
         with open(file_name, "wb") as image_file:
             image_file.write(file.file.read())

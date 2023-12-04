@@ -13,8 +13,6 @@ class JwtBearer(HTTPBearer):
                 raise HTTPException(status_code=403, detail="invalid authentication scheme")
             if not self.verify_jwt(credentials.credentials):
                 raise HTTPException(status_code=403, detail="invalid or expired token")
-            print("aaa")
-            print(credentials.credentials)
             return credentials.credentials
         else:
             raise HTTPException(status_code=403, detail="invalid authorization code")

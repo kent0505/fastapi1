@@ -7,13 +7,10 @@ from app.routers.blog        import router as blog_router
 from app.routers.content     import router as content_router
 from app.routers.image       import router as image_router
 from app.home                import router as home_router
-from app.database            import *
-from app.config              import *
+from app.config              import DOCS_URL, ORIGINS
 import os
 
 os.makedirs("static", exist_ok=True)
-
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(docs_url=DOCS_URL, redoc_url=None)
 app.add_middleware(
@@ -32,7 +29,3 @@ app.include_router(category_router, prefix="/api/v1/category", tags=["Category"]
 app.include_router(blog_router,     prefix="/api/v1/blog",     tags=["Blog"])
 app.include_router(content_router,  prefix="/api/v1/content",  tags=["Content"])
 app.include_router(image_router,    prefix="/api/v1/upload",   tags=["Image"])
-
-# if __name__ == "__main__":
-#     import uvicorn
-#     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -41,7 +41,11 @@ async def get_categories(db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
-    db.add(Category(title=category.title, index=0, type=category.type))
+    db.add(Category(
+        title = category.title, 
+        index = 0, 
+        type  = category.type
+    ))
     db.commit()
 
     return {"message": "category added"}

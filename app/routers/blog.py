@@ -3,6 +3,7 @@ from pydantic            import BaseModel
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
 from app.database        import *
+import time
 
 router = APIRouter()
 
@@ -42,7 +43,12 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
     row = db.query(Category).filter(Category.id == blog.category_id, Category.type == 0).first()
 
     if row:
-        db.add(Blog(title=blog.title, index=blog.index, category_id=blog.category_id))
+        db.add(Blog(
+            title       = blog.title, 
+            index       = blog.index,
+            date        = int(time.time()),
+            category_id = blog.category_id,
+        ))
         db.commit()
 
         return {"message": "blog added"}
@@ -55,8 +61,9 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
     row = db.query(Blog).filter(Blog.id == blog.id, Category.type == 0).first()
 
     if row:
-        row.title =       blog.title
-        row.index =       blog.id
+        row.title       = blog.title
+        row.index       = blog.id
+        row.date        = int(time.time())
         row.category_id = blog.category_id
         db.commit()
 

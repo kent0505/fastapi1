@@ -4,42 +4,45 @@
     <title>{{ title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="icon" type="image/png" href="/templates/icon.png" />
-    <link rel="stylesheet" href="/templates/style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="navbar">
-            <ul>
-                <li><img src="/templates/icon.png" alt=""></li>
-                <li><a class="active" href="{{ url }}">Home</a></li>
-            </ul>
-        </div>
+<body class="flex justify-center">
+    <div class="text-xl max-w-2xl w-full">
+        <ul class="flex justify-start bg-neutral-700 w-full p-2.5 space-x-4 items-center">
+            <li><img class="h-7" src="/templates/icon.png" alt=""></li>
+            <li><a class="text-white" href="{{ url }}">Home</a></li>
+        </ul>
         {% if index == 1 %}
-            <ul>
+            <ul class="m-2.5">
                 {% for category in categories %}
                     {% if category.type == 0 %}
-                        <li id="li-category"><a href="{{ category.title.replace(' ', '-') }}">{{ category.title }}</a></li>
+                        <li><a class="underline" href="{{ category.title.replace(' ', '-') }}">{{ category.title }}</a></li>
                     {% else %}
-                        <p id="p-category">{{ category.title }}</p>
+                        <p class="text-slate-500 text-2xl my-2 ">{{ category.title }}</p>
                     {% endif %}
                 {% endfor %}
             </ul>
         {% elif index == 2 %}
-            <ul>
+            <ul class="m-2.5">
                 {% for blog in blogs %}
-                    <li id="li-category"><a href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
+                    <li><a class="underline" href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
                 {% endfor %}
             </ul>
         {% elif index == 3 %}
-            <div id="pythonTextContainer"></div>
+            <div class="m-2.5">
+                <div>
+                    <p class="text-3xl">{{ title }}</p>
+                    <p class="text-sm">{{ date }}</p>
+                    <br>
+                </div>
+                <div id="pythonTextContainer"></div>
+            </div>
         {% endif %}
     </div>
     <script>
         const pythonText = `{{ contents | safe }}`;
         const container = document.getElementById("pythonTextContainer");
-        if (pythonText) {
-            container.innerHTML = pythonText; 
-        }
+        if (pythonText) {container.innerHTML = pythonText;}
     </script>
 </body>
 </html>

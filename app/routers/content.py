@@ -40,7 +40,11 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
     row = db.query(Blog).filter(Blog.id == content.blog_id).first()
 
     if row:
-        db.add(Content(title=content.title, image=0, blog_id=content.blog_id))
+        db.add(Content(
+            title   = content.title, 
+            image   = 0, 
+            blog_id = content.blog_id
+        ))
         db.commit()
 
         return {"message": "content added"}
