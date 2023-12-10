@@ -40,7 +40,8 @@ async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Dep
 async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(get_db)):
     row = db.query(Content).filter(Content.id == id).first()
 
-    if row and row.image == 1:
+    # if row and row.image == 1:
+    if row:
         try:
             os.remove(f"static/{row.title}")
         except:
@@ -53,6 +54,7 @@ async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(
             image_file.write(file.file.read())
 
         row.title = unique_filename
+        row.image = 1
         db.commit()
 
         return {"message": "image updated successfully"}

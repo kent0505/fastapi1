@@ -18,11 +18,15 @@ class ContentUpdate(BaseModel):
 class ContentDelete(BaseModel):
     id: int
 
+
 @router.get("/{blog_id}")
 async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     contentList = []
 
-    contents = db.query(Content).filter(Content.blog_id == blog_id).all()
+    if blog_id == 0:
+        contents = db.query(Content).order_by(Content.blog_id).all()
+    else:
+        contents = db.query(Content).filter(Content.blog_id == blog_id).all()
 
     for content in contents:
         contentList.append({
@@ -57,7 +61,13 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
     row = db.query(Content).filter(Content.id == content.id).first()
 
     if row:
+        try:
+            os.remove(f"static/{row.title}")
+        except:
+            print("not found")
+
         row.title = content.title
+        row.image = 0
         db.commit()
 
         return {"message": "content updated"}

@@ -1,5 +1,6 @@
 from fastapi             import APIRouter, HTTPException, Depends
 from pydantic            import BaseModel
+from sqlalchemy          import desc
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
 from app.database        import *
@@ -26,12 +27,14 @@ class BlogDelete(BaseModel):
 async def get_blogs(db: Session = Depends(get_db)):
     blogList = []
 
-    blogs = db.query(Blog).order_by(Blog.index).all()
+    blogs = db.query(Blog).order_by(desc(Blog.index)).all()
 
     for blog in blogs:
         blogList.append({
             "id":          blog.id,
             "title":       blog.title,
+            "index":       blog.index,
+            "date":        blog.date,
             "category_id": blog.category_id,
         })
 
@@ -62,7 +65,7 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
 
     if row:
         row.title       = blog.title
-        row.index       = blog.id
+        row.index       = blog.index
         row.date        = int(time.time())
         row.category_id = blog.category_id
         db.commit()
