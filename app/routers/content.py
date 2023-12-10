@@ -1,19 +1,23 @@
 from fastapi             import APIRouter, HTTPException, Depends
 from pydantic            import BaseModel
+from sqlalchemy          import desc
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
 from app.database        import *
+from .image              import remove_image
 import os
 
 router = APIRouter()
 
 class ContentAdd(BaseModel):
     title:   str
+    index:   int
     blog_id: int
 
 class ContentUpdate(BaseModel):
     id:    int
     title: str
+    index: int
 
 class ContentDelete(BaseModel):
     id: int
@@ -26,12 +30,13 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     if blog_id == 0:
         contents = db.query(Content).order_by(Content.blog_id).all()
     else:
-        contents = db.query(Content).filter(Content.blog_id == blog_id).all()
+        contents = db.query(Content).filter(Content.blog_id == blog_id).order_by(desc(Content.index)).all()
 
     for content in contents:
         contentList.append({
             "id":      content.id,
             "title":   content.title,
+            "index":   content.index,
             "image":   content.image,
             "blog_id": content.blog_id
         })
@@ -45,7 +50,8 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
 
     if row:
         db.add(Content(
-            title   = content.title, 
+            title   = content.title,
+            index   = content.index,
             image   = 0, 
             blog_id = content.blog_id
         ))
@@ -61,12 +67,10 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
     row = db.query(Content).filter(Content.id == content.id).first()
 
     if row:
-        try:
-            os.remove(f"static/{row.title}")
-        except:
-            print("not found")
+        remove_image(row.title)
 
         row.title = content.title
+        row.index = content.index
         row.image = 0
         db.commit()
 

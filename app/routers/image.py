@@ -7,8 +7,34 @@ import os
 
 router = APIRouter(dependencies=[Depends(JwtBearer())])
 
+
+def add_image(file: UploadFile):
+    timestamp =   int(time.time())
+    format =      file.filename.split('.')[-1] # jpg/jpeg/png
+    unique_name = timestamp + "." + format
+    file_name =   os.path.join("static", unique_name)
+
+    with open(file_name, "wb") as image_file:
+        image_file.write(file.file.read())
+
+    return unique_name
+
+
+def remove_image(title: str):
+    try:
+        os.remove(f"static/{title}")
+    except:
+        print("not found")
+
+
 @router.post("/")
-async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Depends(get_db)):
+async def upload_file(
+        file:    UploadFile, 
+        index:   int     = Form(), 
+        blog_id: int     = Form(), 
+        db:      Session = Depends(get_db)
+    ):
+
     if not file.filename:
         raise HTTPException(400, "file not found")
     
@@ -18,14 +44,11 @@ async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Dep
     row = db.query(Blog).filter(Blog.id == blog_id).first()
 
     if row:
-        unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
-        file_name = os.path.join("static", unique_filename)
-
-        with open(file_name, "wb") as image_file:
-            image_file.write(file.file.read())
+        unique_filename = add_image(file)
         
         db.add(Content(
-            title   = unique_filename, 
+            title   = unique_filename,
+            index   = index,
             image   = 1, 
             blog_id = blog_id
         ))
@@ -37,23 +60,22 @@ async def upload_file(file: UploadFile, blog_id: int = Form(), db: Session = Dep
 
 
 @router.put("/")
-async def update_file(file: UploadFile, id: int = Form(), db: Session = Depends(get_db)):
+async def update_file(
+        file:  UploadFile, 
+        id:    int     = Form(), 
+        index: int     = Form(), 
+        db:    Session = Depends(get_db)
+    ):
+
     row = db.query(Content).filter(Content.id == id).first()
 
-    # if row and row.image == 1:
     if row:
-        try:
-            os.remove(f"static/{row.title}")
-        except:
-            print("not found")
+        remove_image(row.title)
 
-        unique_filename = f"{int(time.time())}.{file.filename.split('.')[-1]}"
-        file_name = os.path.join("static", unique_filename)
+        unique_name = add_image(file)
 
-        with open(file_name, "wb") as image_file:
-            image_file.write(file.file.read())
-
-        row.title = unique_filename
+        row.title = unique_name
+        row.index = index
         row.image = 1
         db.commit()
 

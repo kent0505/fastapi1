@@ -59,7 +59,7 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
     db_blog = db.query(Blog).filter(Blog.title == blog).first()
 
     if db_category and db_blog:
-        contents = db.query(Content).filter(Content.blog_id == db_blog.id).all()
+        contents = db.query(Content).filter(Content.blog_id == db_blog.id).order_by(desc(Content.index)).all()
 
         date = datetime.fromtimestamp(db_blog.date).strftime('%d.%m.%Y')
 
