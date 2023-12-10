@@ -11,7 +11,7 @@ router = APIRouter(dependencies=[Depends(JwtBearer())])
 def add_image(file: UploadFile):
     timestamp =   int(time.time())
     format =      file.filename.split('.')[-1] # jpg/jpeg/png
-    unique_name = timestamp + "." + format
+    unique_name = f"{timestamp}.{format}"
     file_name =   os.path.join("static", unique_name)
 
     with open(file_name, "wb") as image_file:
