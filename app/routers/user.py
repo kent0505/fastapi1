@@ -3,7 +3,7 @@ from pydantic             import BaseModel
 from sqlalchemy.orm       import Session
 from app.auth.jwt_bearer  import JwtBearer
 from app.auth.jwt_handler import signJWT
-from app.config           import USERNAME, PASSWORD
+from app.config           import *
 from app.database         import *
 import bcrypt
 
