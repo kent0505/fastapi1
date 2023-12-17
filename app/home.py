@@ -4,8 +4,9 @@ from sqlalchemy.orm     import Session
 from sqlalchemy         import desc
 from datetime           import datetime
 from app.database       import *
-from app.config         import URL
+from app.config         import *
 import markdown
+import logging
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -16,10 +17,10 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
     categories = []
 
     categories = db.query(Category).order_by(desc(Category.index)).all()
-
+    
     return templates.TemplateResponse("index.html", {
         "request":    request,
-        "title":      "Categories",
+        "title":      "MYCHIMERA - Категории",
         "index":      1,
         "url":        URL,
         "categories": categories,
@@ -45,18 +46,18 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "blogs":   blogs,
         })
 
+    logging.warning("CATEGORY NOT FOUND")
     raise HTTPException(404, "Not found")
 
 
 @router.get("/{category}/{blog}")
-async def blogs_page(request: Request, category: str, blog: str, db: Session = Depends(get_db)):
+async def blogs_page(request: Request, category: str, blog: int, db: Session = Depends(get_db)):
     category = category.replace("-", " ")
-    blog = blog.replace("-", " ")
 
     contents = []
     
     db_category = db.query(Category).filter(Category.title == category).first()
-    db_blog = db.query(Blog).filter(Blog.title == blog).first()
+    db_blog = db.query(Blog).filter(Blog.id == blog).first()
 
     if db_category and db_blog:
         contents = db.query(Content).filter(Content.blog_id == db_blog.id).order_by(desc(Content.index)).all()
@@ -67,17 +68,18 @@ async def blogs_page(request: Request, category: str, blog: str, db: Session = D
 
         for content in contents:
             if content.image == 0:
-                text += f"<br>{content.title}\n\n"
+                text += f"{content.title}<br><br>"
             else:
-                text += f"<br>![]({URL}/images/{content.title})\n\n"
+                text += f"![]({URL}/images/{content.title})<br><br>"
 
         return templates.TemplateResponse("index.html", {
             "request":  request,
-            "title":    blog,
+            "title":    db_blog.title,
             "date":     date,
             "index":    3,
             "url":      URL,
             "contents": markdown.markdown(text),
         })
 
+    logging.warning("CATEGORY OR BLOG NOT FOUND")
     raise HTTPException(404, "Not found")

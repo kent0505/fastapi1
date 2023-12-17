@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>{{ title }}</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="icon" type="image/png" href="/templates/icon.png" />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -27,7 +28,7 @@
         {% elif index == 2 %}
             <ul class="m-2.5">
                 {% for blog in blogs %}
-                    <li><a class="underline" href="{{ title.replace(' ', '-') }}/{{ blog.title.replace(' ', '-') }}">{{ blog.title }}</a></li>
+                    <li><a class="underline" href="{{ title.replace(' ', '-') }}/{{ blog.id }}">{{ blog.title }}</a></li>
                 {% endfor %}
             </ul>
         {% elif index == 3 %}
