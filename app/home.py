@@ -20,7 +20,7 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
     
     return templates.TemplateResponse("index.html", {
         "request":    request,
-        "title":      "MYCHIMERA - Категории",
+        "title":      "Категории",
         "index":      1,
         "url":        URL,
         "categories": categories,
