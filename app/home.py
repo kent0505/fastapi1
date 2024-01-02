@@ -1,10 +1,10 @@
 from fastapi            import APIRouter, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm     import Session
-from sqlalchemy         import desc
 from datetime           import datetime
-from app.database       import *
+from app.database       import get_db
 from app.config         import *
+import app.crud as DB
 import markdown
 import logging
 
@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 async def home_page(request: Request, db: Session = Depends(get_db)):
     categories = []
 
-    categories = db.query(Category).order_by(desc(Category.index)).all()
+    categories = DB.get_all_categories(db)
     
     return templates.TemplateResponse("index.html", {
         "request":    request,
@@ -33,10 +33,10 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
 
     blogs = []
 
-    row = db.query(Category).filter(Category.title == category).first()
+    row = DB.get_category_by_title(db, category)
 
     if row:
-        blogs = db.query(Blog).filter(Blog.category_id == row.id).order_by(desc(Blog.index)).all()
+        blogs = DB.get_all_blogs_by_category_id(db, row.id)
 
         return templates.TemplateResponse("index.html", {
             "request": request,
@@ -55,12 +55,12 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
     category = category.replace("-", " ")
 
     contents = []
-    
-    db_category = db.query(Category).filter(Category.title == category).first()
-    db_blog = db.query(Blog).filter(Blog.id == blog).first()
+
+    db_category = DB.get_category_by_title(db, category)
+    db_blog = DB.get_blog_by_id(db, blog)
 
     if db_category and db_blog:
-        contents = db.query(Content).filter(Content.blog_id == db_blog.id).order_by(desc(Content.index)).all()
+        contents = DB.get_all_contents_by_blog_id(db, db_blog.id)
 
         date = datetime.fromtimestamp(db_blog.date).strftime('%d.%m.%Y')
 
@@ -70,7 +70,7 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
             if content.image == 0:
                 text += f"{content.title}<br><br>"
             else:
-                text += f"![]({URL}/images/{content.title})<br><br>"
+                text += f"![]({URL}/images/{content.title}/)<br><br>"
 
         return templates.TemplateResponse("index.html", {
             "request":  request,

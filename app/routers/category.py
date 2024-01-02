@@ -1,9 +1,9 @@
 from fastapi             import APIRouter, HTTPException, Depends
 from pydantic            import BaseModel
-from sqlalchemy          import desc
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
-from app.database        import *
+from app.database        import get_db
+import app.crud as DB
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ class CategoryDelete(BaseModel):
 async def get_categories(db: Session = Depends(get_db)):
     categoriesList = []
 
-    categories = db.query(Category).order_by(desc(Category.index)).all()
+    categories = DB.get_all_categories(db)
 
     for category in categories:
         categoriesList.append({
@@ -41,25 +41,17 @@ async def get_categories(db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
-    db.add(Category(
-        title = category.title, 
-        index = 0, 
-        type  = category.type
-    ))
-    db.commit()
+    DB.add_category(db, category.title, category.index, category.type)
 
     return {"message": "category added"}
 
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_category(category: CategoryUpdate, db: Session = Depends(get_db)):
-    row = db.query(Category).filter(Category.id == category.id).first()
+    row = DB.get_category_by_id(db, category.id)
 
     if row:
-        row.title = category.title
-        row.index = category.index
-        row.type =  category.type
-        db.commit()
+        DB.update_category(db, row, category.title, category.index, category.type)
 
         return {"message": "category updated"}
 
@@ -68,11 +60,10 @@ async def update_category(category: CategoryUpdate, db: Session = Depends(get_db
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_category(category: CategoryDelete, db: Session = Depends(get_db)):
-    row = db.query(Category).filter(Category.id == category.id).first()
+    row = DB.get_category_by_id(db, category.id)
 
     if row:
-        db.delete(row)
-        db.commit()
+        DB.delete_category(db, row)
 
         return {"message": "category deleted"}
     

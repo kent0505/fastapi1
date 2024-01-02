@@ -1,11 +1,10 @@
 from fastapi             import APIRouter, HTTPException, Depends
 from pydantic            import BaseModel
-from sqlalchemy          import desc
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
-from app.database        import *
-from .image              import remove_image
-import os
+from app.database        import get_db
+from app.utils           import *
+import app.crud as DB
 
 router = APIRouter()
 
@@ -28,9 +27,9 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     contentList = []
 
     if blog_id == 0:
-        contents = db.query(Content).order_by(Content.blog_id).all()
+        contents = DB.get_all_contents(db)
     else:
-        contents = db.query(Content).filter(Content.blog_id == blog_id).order_by(desc(Content.index)).all()
+        contents = DB.get_all_contents_by_blog_id(db, blog_id)
 
     for content in contents:
         contentList.append({
@@ -46,16 +45,10 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
-    row = db.query(Blog).filter(Blog.id == content.blog_id).first()
+    row = DB.get_content_by_blog_id(db, content.blog_id)
 
     if row:
-        db.add(Content(
-            title   = content.title,
-            index   = content.index,
-            image   = 0, 
-            blog_id = content.blog_id
-        ))
-        db.commit()
+        DB.add_content(db, content.title, content.index, 0, content.blog_id)
 
         return {"message": "content added"}
     
@@ -64,15 +57,10 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
-    row = db.query(Content).filter(Content.id == content.id).first()
+    row = DB.get_content_by_id(db, content.id)
 
     if row:
-        remove_image(row.title)
-
-        row.title = content.title
-        row.index = content.index
-        row.image = 0
-        db.commit()
+        DB.update_content(db, row, content.title, content.index)
 
         return {"message": "content updated"}
 
@@ -81,16 +69,12 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_content(content: ContentDelete, db: Session = Depends(get_db)):
-    row = db.query(Content).filter(Content.id == content.id).first()
+    row = DB.get_content_by_id(db, content.id)
 
     if row:
-        try:
-            os.remove(f"static/{row.title}")
-        except:
-            print("not found")
+        remove_image(row.title)
 
-        db.delete(row)
-        db.commit()
+        DB.delete_content(db, row)
 
         return {"message": "content deleted"}
 

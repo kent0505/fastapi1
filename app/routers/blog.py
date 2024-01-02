@@ -1,9 +1,9 @@
 from fastapi             import APIRouter, HTTPException, Depends
 from pydantic            import BaseModel
-from sqlalchemy          import desc
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
-from app.database        import *
+from app.database        import get_db
+import app.crud as DB
 import time
 
 router = APIRouter()
@@ -27,7 +27,7 @@ class BlogDelete(BaseModel):
 async def get_blogs(db: Session = Depends(get_db)):
     blogList = []
 
-    blogs = db.query(Blog).order_by(desc(Blog.index)).all()
+    blogs = DB.get_all_blogs(db)
 
     for blog in blogs:
         blogList.append({
@@ -43,16 +43,10 @@ async def get_blogs(db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
-    row = db.query(Category).filter(Category.id == blog.category_id, Category.type == 0).first()
+    row = DB.get_blog_by_category_id(db, blog.category_id)
 
     if row:
-        db.add(Blog(
-            title       = blog.title, 
-            index       = blog.index,
-            date        = int(time.time()),
-            category_id = blog.category_id,
-        ))
-        db.commit()
+        DB.add_blog(db, blog.title, blog.index, int(time.time()), blog.category_id)
 
         return {"message": "blog added"}
     
@@ -61,14 +55,10 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
-    row = db.query(Blog).filter(Blog.id == blog.id, Category.type == 0).first()
+    row = DB.get_blog_by_id(db, blog.id)
 
     if row:
-        row.title       = blog.title
-        row.index       = blog.index
-        row.date        = int(time.time())
-        row.category_id = blog.category_id
-        db.commit()
+        DB.update_blog(db, row, blog.title, blog.index, int(time.time()), blog.category_id)
 
         return {"message": "blog updated"}
     
@@ -77,11 +67,10 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_blog(blog: BlogDelete, db: Session = Depends(get_db)):
-    row = db.query(Blog).filter(Blog.id == blog.id).first()
+    row = DB.get_blog_by_id(db, blog.id)
 
     if row:
-        db.delete(row)
-        db.commit()
+        DB.delete_blog(db, row)
 
         return {"message": "blog deleted"}
     

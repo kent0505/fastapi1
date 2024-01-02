@@ -1,30 +1,12 @@
 from fastapi             import APIRouter, UploadFile, HTTPException, Form, Depends
 from app.auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm      import Session
-from app.database        import *
-import time
-import os
+from app.database        import get_db
+from app.utils           import *
+import app.crud as DB
+import logging
 
 router = APIRouter(dependencies=[Depends(JwtBearer())])
-
-
-def add_image(file: UploadFile):
-    timestamp =   int(time.time())
-    format =      file.filename.split('.')[-1] # jpg/jpeg/png
-    unique_name = f"{timestamp}.{format}"
-    file_name =   os.path.join("static", unique_name)
-
-    with open(file_name, "wb") as image_file:
-        image_file.write(file.file.read())
-
-    return unique_name
-
-
-def remove_image(title: str):
-    try:
-        os.remove(f"static/{title}")
-    except:
-        print("not found")
 
 
 @router.post("/")
@@ -35,24 +17,16 @@ async def upload_file(
         db:      Session = Depends(get_db)
     ):
 
-    if not file.filename:
-        raise HTTPException(400, "file not found")
-    
-    if not file.content_type.startswith("image/"):
-        raise HTTPException(400, "only image files are allowed")
+    if not file.filename and file.content_type.startswith("image/"):
+        logging.error("FILE ERROR")
+        raise HTTPException(400, "file error")
 
-    row = db.query(Blog).filter(Blog.id == blog_id).first()
+    row = DB.get_content_by_blog_id(db, blog_id)
 
     if row:
-        unique_filename = add_image(file)
-        
-        db.add(Content(
-            title   = unique_filename,
-            index   = index,
-            image   = 1, 
-            blog_id = blog_id
-        ))
-        db.commit()
+        unique_name = add_image(file)
+
+        DB.add_content(db, unique_name, index, 1, blog_id)
 
         return {"message": "image uploaded successfully"}
 
@@ -67,17 +41,14 @@ async def update_file(
         db:    Session = Depends(get_db)
     ):
 
-    row = db.query(Content).filter(Content.id == id).first()
+    row = DB.get_content_by_id(db, id)
 
     if row:
         remove_image(row.title)
 
         unique_name = add_image(file)
 
-        row.title = unique_name
-        row.index = index
-        row.image = 1
-        db.commit()
+        DB.update_image(db, row, unique_name, index)
 
         return {"message": "image updated successfully"}
 
