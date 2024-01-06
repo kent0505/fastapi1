@@ -3,10 +3,13 @@ from pydantic            import BaseModel
 from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
+from app.utils           import get_timestamp
 import app.crud as DB
-import time
+import logging
+
 
 router = APIRouter()
+
 
 class BlogAdd(BaseModel):
     title:       str
@@ -38,6 +41,7 @@ async def get_blogs(db: Session = Depends(get_db)):
             "category_id": blog.category_id,
         })
 
+    logging.info("GET /api/v1/blog/")
     return {"blog": blogList}
 
 
@@ -46,10 +50,14 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
     row = DB.get_blog_by_category_id(db, blog.category_id)
 
     if row:
-        DB.add_blog(db, blog.title, blog.index, int(time.time()), blog.category_id)
+        timestamp = get_timestamp()
 
+        DB.add_blog(db, blog.title, blog.index, timestamp, blog.category_id)
+
+        logging.info("POST 200 /api/v1/blog/")
         return {"message": "blog added"}
     
+    logging.error("POST 404 /api/v1/blog/ NOT FOUND")
     raise HTTPException(404, "id not found")
 
 
@@ -58,10 +66,14 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
     row = DB.get_blog_by_id(db, blog.id)
 
     if row:
-        DB.update_blog(db, row, blog.title, blog.index, int(time.time()), blog.category_id)
+        timestamp = get_timestamp()
 
+        DB.update_blog(db, row, blog.title, blog.index, timestamp, blog.category_id)
+
+        logging.info("PUT 200 /api/v1/blog/")
         return {"message": "blog updated"}
     
+    logging.error("PUT 404 /api/v1/blog/ NOT FOUND")
     raise HTTPException(404, "id not found")
 
 
@@ -72,6 +84,8 @@ async def delete_blog(blog: BlogDelete, db: Session = Depends(get_db)):
     if row:
         DB.delete_blog(db, row)
 
+        logging.info("DELETE 200 /api/v1/blog/")
         return {"message": "blog deleted"}
     
+    logging.error("DELETE 404 /api/v1/blog/ NOT FOUND")
     raise HTTPException(404, "id not found")

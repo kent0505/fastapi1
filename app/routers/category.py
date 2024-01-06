@@ -4,8 +4,11 @@ from sqlalchemy.orm      import Session
 from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
 import app.crud as DB
+import logging
+
 
 router = APIRouter()
+
 
 class CategoryAdd(BaseModel):
     title: str
@@ -36,6 +39,7 @@ async def get_categories(db: Session = Depends(get_db)):
             "type":  category.type
         })
 
+    logging.info("GET 200 /api/v1/category/")
     return {"category": categoriesList}
 
 
@@ -43,6 +47,7 @@ async def get_categories(db: Session = Depends(get_db)):
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
     DB.add_category(db, category.title, category.index, category.type)
 
+    logging.info("POST 200 /api/v1/category/")
     return {"message": "category added"}
 
 
@@ -53,8 +58,10 @@ async def update_category(category: CategoryUpdate, db: Session = Depends(get_db
     if row:
         DB.update_category(db, row, category.title, category.index, category.type)
 
+        logging.info("PUT 200 /api/v1/category/")
         return {"message": "category updated"}
 
+    logging.error("PUT 404 /api/v1/category/ NOT FOUND")
     raise HTTPException(404, "id not found")
 
 
@@ -65,6 +72,8 @@ async def delete_category(category: CategoryDelete, db: Session = Depends(get_db
     if row:
         DB.delete_category(db, row)
 
+        logging.info("DELETE 200 /api/v1/category/")
         return {"message": "category deleted"}
     
+    logging.error("DELETE 200 /api/v1/category/ NOT FOUND")
     raise HTTPException(404, "id not found")

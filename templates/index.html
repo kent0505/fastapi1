@@ -24,11 +24,15 @@
                 {% endfor %}
             </ul>
         {% elif index == 2 %}
-            <ul class="m-2.5">
-                {% for blog in blogs %}
-                    <li><a class="underline" href="{{ title.replace(' ', '-') }}/{{ blog.id }}">{{ blog.title }}</a></li>
-                {% endfor %}
-            </ul>
+            {% if blogs == [] %}
+                <h1 class="m-2.5">Скоро</h1>
+            {% else %}
+                <ul class="m-2.5">
+                    {% for blog in blogs %}
+                        <li><a class="underline" href="{{ title.replace(' ', '-') }}/{{ blog.id }}">{{ blog.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% elif index == 3 %}
             <div class="m-2.5 justify-center">
                 <div>

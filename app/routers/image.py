@@ -6,6 +6,7 @@ from app.utils           import *
 import app.crud as DB
 import logging
 
+
 router = APIRouter(dependencies=[Depends(JwtBearer())])
 
 
@@ -14,23 +15,25 @@ async def upload_file(
         file:    UploadFile, 
         index:   int     = Form(), 
         blog_id: int     = Form(), 
-        db:      Session = Depends(get_db)
+        db:      Session = Depends(get_db),
     ):
 
-    if not file.filename and file.content_type.startswith("image/"):
-        logging.error("FILE ERROR")
-        raise HTTPException(400, "file error")
+    if file.filename and file.content_type.startswith("image/"):
+        row = DB.get_content_by_blog_id(db, blog_id)
 
-    row = DB.get_content_by_blog_id(db, blog_id)
+        if row:
+            unique_name = add_image(file)
 
-    if row:
-        unique_name = add_image(file)
+            DB.add_content(db, unique_name, index, 1, blog_id)
 
-        DB.add_content(db, unique_name, index, 1, blog_id)
+            logging.info("POST 200 /api/v1/upload/")
+            return {"message": "image uploaded successfully"}
 
-        return {"message": "image uploaded successfully"}
+        logging.error(f"POST 404 /api/v1/upload/ NOT FOUND")
+        raise HTTPException(404, "id not found")
 
-    raise HTTPException(404, "id not found")
+    logging.error("POST 400 /api/v1/upload/ FILE ERROR")
+    raise HTTPException(400, "file error")
 
 
 @router.put("/")
@@ -41,15 +44,21 @@ async def update_file(
         db:    Session = Depends(get_db)
     ):
 
-    row = DB.get_content_by_id(db, id)
+    if file.filename and file.content_type.startswith("image/"):
+        row = DB.get_content_by_id(db, id)
 
-    if row:
-        remove_image(row.title)
+        if row:
+            remove_image(row.title)
 
-        unique_name = add_image(file)
+            unique_name = add_image(file)
 
-        DB.update_image(db, row, unique_name, index)
+            DB.update_image(db, row, unique_name, index)
 
-        return {"message": "image updated successfully"}
+            logging.info("PUT 200 /api/v1/upload/")
+            return {"message": "image updated successfully"}
 
-    raise HTTPException(404, "id not found")
+        logging.error(f"PUT 404 /api/v1/upload/ NOT FOUND")
+        raise HTTPException(404, "id not found")
+
+    logging.error("PUT 400 /api/v1/upload/ FILE ERROR")
+    raise HTTPException(400, "file error")

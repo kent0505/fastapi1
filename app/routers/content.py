@@ -5,8 +5,11 @@ from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
 from app.utils           import *
 import app.crud as DB
+import logging
+
 
 router = APIRouter()
+
 
 class ContentAdd(BaseModel):
     title:   str
@@ -40,6 +43,7 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
             "blog_id": content.blog_id
         })
 
+    logging.info("GET 200 /api/v1/content/")
     return {"content": contentList}
 
 
@@ -50,8 +54,10 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
     if row:
         DB.add_content(db, content.title, content.index, 0, content.blog_id)
 
+        logging.info("POST 200 /api/v1/content/")
         return {"message": "content added"}
     
+    logging.error("POST 404 /api/v1/content/ NOT FOUND")
     raise HTTPException(404, "id not found")
 
 
@@ -62,8 +68,10 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
     if row:
         DB.update_content(db, row, content.title, content.index)
 
+        logging.info("PUT 200 /api/v1/content/")
         return {"message": "content updated"}
 
+    logging.error("PUT 404 /api/v1/content/ NOT FOUND")
     raise HTTPException(404, "id not found")
     
 
@@ -76,6 +84,8 @@ async def delete_content(content: ContentDelete, db: Session = Depends(get_db)):
 
         DB.delete_content(db, row)
 
+        logging.info("DELETE 200 /api/v1/content/")
         return {"message": "content deleted"}
 
+    logging.error("DELETE 404 /api/v1/content/ NOT FOUND")
     raise HTTPException(404, "id not found")

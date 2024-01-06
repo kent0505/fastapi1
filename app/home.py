@@ -1,12 +1,13 @@
 from fastapi            import APIRouter, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm     import Session
-from datetime           import datetime
 from app.database       import get_db
+from app.utils          import formatted_date
 from app.config         import *
 import app.crud as DB
 import markdown
 import logging
+
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -14,17 +15,22 @@ templates = Jinja2Templates(directory="templates")
 
 @router.get("/")
 async def home_page(request: Request, db: Session = Depends(get_db)):
-    categories = []
+    try:
+        categories = []
 
-    categories = DB.get_all_categories(db)
-    
-    return templates.TemplateResponse("index.html", {
-        "request":    request,
-        "title":      "Категории",
-        "index":      1,
-        "url":        URL,
-        "categories": categories,
-    })
+        categories = DB.get_all_categories(db)
+        
+        logging.info("GET 200 /")
+        return templates.TemplateResponse("index.html", {
+            "request":    request,
+            "title":      "Категории",
+            "index":      1,
+            "url":        URL,
+            "categories": categories,
+        })
+    except Exception as e:
+        logging.error(e)
+        raise HTTPException(500, "Error")
 
 
 @router.get("/{category}")
@@ -38,6 +44,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
     if row:
         blogs = DB.get_all_blogs_by_category_id(db, row.id)
 
+        logging.info(f"GET 200 /{category}/")
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
@@ -45,8 +52,8 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "url":     URL,
             "blogs":   blogs,
         })
-
-    logging.warning("CATEGORY NOT FOUND")
+    
+    logging.error(f"GET 404 /{category}/ NOT FOUND")
     raise HTTPException(404, "Not found")
 
 
@@ -62,24 +69,25 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
     if db_category and db_blog:
         contents = DB.get_all_contents_by_blog_id(db, db_blog.id)
 
-        date = datetime.fromtimestamp(db_blog.date).strftime('%d.%m.%Y')
+        date = formatted_date(db_blog.date)
 
-        text = ""
+        body = ""
 
         for content in contents:
             if content.image == 0:
-                text += f"{content.title}<br><br>"
+                body += f"{content.title}<br><br>"
             else:
-                text += f"![]({URL}/images/{content.title}/)<br><br>"
-
+                body += f"![]({URL}/images/{content.title}/)<br><br>"
+            
+        logging.info(f"GET 200 /{category}/{blog}/")
         return templates.TemplateResponse("index.html", {
             "request":  request,
             "title":    db_blog.title,
             "date":     date,
             "index":    3,
             "url":      URL,
-            "contents": markdown.markdown(text),
+            "contents": markdown.markdown(body),
         })
-
-    logging.warning("CATEGORY OR BLOG NOT FOUND")
+    
+    logging.error(f"GET 404 /{category}/{blog}/ NOT FOUND")
     raise HTTPException(404, "Not found")
