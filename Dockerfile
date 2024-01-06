@@ -13,4 +13,4 @@ EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # docker build -t fastapi1 .                         // сделать сборку
-# docker run -p 8000:8000 fastapi1                   // запуск в локальном пк
+# docker run -p 8000:8000 fastapi1                   // запуск
