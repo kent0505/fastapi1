@@ -32,7 +32,7 @@ async def login(user: UserModel, db: Session = Depends(get_db)):
         logging.info("POST 200 /api/v1/user/login/")
         return {"access_token": signJWT(user.username, "admin")}
 
-    row = DB.get_user_by_username(db, user.username)
+    row = await DB.get_user_by_username(db, user.username)
 
     if row:
         hashed = check_password(user.password, row.password)
@@ -47,7 +47,7 @@ async def login(user: UserModel, db: Session = Depends(get_db)):
 
 @router.post("/register")
 async def register(user: UserModel, db: Session = Depends(get_db)):
-    row = DB.get_user_by_username(db, user.username)
+    row = await DB.get_user_by_username(db, user.username)
 
     if row or user.username.lower() == "admin":
         logging.error("POST 409 /api/v1/user/register/")
@@ -55,7 +55,7 @@ async def register(user: UserModel, db: Session = Depends(get_db)):
 
     hashed = hash_password(user.password)
 
-    DB.add_user(db, user.username, hashed)
+    await DB.add_user(db, user.username, hashed)
 
     logging.info("POST 200 /api/v1/user/register/")
     return {"message": "user added"}
@@ -65,7 +65,7 @@ async def register(user: UserModel, db: Session = Depends(get_db)):
 async def get_users(db: Session = Depends(get_db)):
     usersList = []
 
-    users = DB.get_all_users(db)
+    users = await DB.get_all_users(db)
 
     for user in users:
         usersList.append({
@@ -80,12 +80,12 @@ async def get_users(db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_user(user: UserUpdateModel, db: Session = Depends(get_db)):
-    row = DB.get_user_by_id(db, user.id)
+    row = await DB.get_user_by_id(db, user.id)
 
     if row and user.username != "" or user.password != "" and user.username.lower() != "admin":
         hashed = hash_password(user.password)
 
-        DB.update_user(db, row, user.username, hashed)
+        await DB.update_user(db, row, user.username, hashed)
 
         logging.info("PUT 200 /api/v1/user/")
         return {"message": "user updated"}
@@ -96,10 +96,10 @@ async def update_user(user: UserUpdateModel, db: Session = Depends(get_db)):
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_user(user: UserDeleteModel, db: Session = Depends(get_db)):
-    row = DB.get_user_by_id(db, user.id)
+    row = await DB.get_user_by_id(db, user.id)
 
     if row:
-        DB.delete_user(db, row)
+        await DB.delete_user(db, row)
 
         logging.info(f"DELETE 200 /api/v1/user/")
         return {"message": "user deleted"}

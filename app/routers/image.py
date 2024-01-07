@@ -19,12 +19,12 @@ async def upload_file(
     ):
 
     if file.filename and file.content_type.startswith("image/"):
-        row = DB.get_content_by_blog_id(db, blog_id)
+        row = await DB.get_content_by_blog_id(db, blog_id)
 
         if row:
             unique_name = add_image(file)
 
-            DB.add_content(db, unique_name, index, 1, blog_id)
+            await DB.add_content(db, unique_name, index, 1, blog_id)
 
             logging.info("POST 200 /api/v1/upload/")
             return {"message": "image uploaded successfully"}
@@ -45,14 +45,14 @@ async def update_file(
     ):
 
     if file.filename and file.content_type.startswith("image/"):
-        row = DB.get_content_by_id(db, id)
+        row = await DB.get_content_by_id(db, id)
 
         if row:
             remove_image(row.title)
 
             unique_name = add_image(file)
 
-            DB.update_image(db, row, unique_name, index)
+            await DB.update_image(db, row, unique_name, index)
 
             logging.info("PUT 200 /api/v1/upload/")
             return {"message": "image updated successfully"}

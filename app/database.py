@@ -4,7 +4,7 @@ from sqlalchemy.orm             import sessionmaker
 
 
 engine = create_engine("sqlite:///./test.db", connect_args={"check_same_thread": False})
-# engine = create_engine(POSTGRES_URL)
+# engine = create_engine("postgresql+psycopg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 
 Base = declarative_base()
 

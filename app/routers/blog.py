@@ -30,7 +30,7 @@ class BlogDelete(BaseModel):
 async def get_blogs(db: Session = Depends(get_db)):
     blogList = []
 
-    blogs = DB.get_all_blogs(db)
+    blogs = await DB.get_all_blogs(db)
 
     for blog in blogs:
         blogList.append({
@@ -41,18 +41,18 @@ async def get_blogs(db: Session = Depends(get_db)):
             "category_id": blog.category_id,
         })
 
-    logging.info("GET /api/v1/blog/")
+    logging.info("GET 200 /api/v1/blog/")
     return {"blog": blogList}
 
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
-    row = DB.get_blog_by_category_id(db, blog.category_id)
+    row = await DB.get_blog_by_category_id(db, blog.category_id)
 
     if row:
         timestamp = get_timestamp()
 
-        DB.add_blog(db, blog.title, blog.index, timestamp, blog.category_id)
+        await DB.add_blog(db, blog.title, blog.index, timestamp, blog.category_id)
 
         logging.info("POST 200 /api/v1/blog/")
         return {"message": "blog added"}
@@ -63,12 +63,12 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
-    row = DB.get_blog_by_id(db, blog.id)
+    row = await DB.get_blog_by_id(db, blog.id)
 
     if row:
         timestamp = get_timestamp()
 
-        DB.update_blog(db, row, blog.title, blog.index, timestamp, blog.category_id)
+        await DB.update_blog(db, row, blog.title, blog.index, timestamp, blog.category_id)
 
         logging.info("PUT 200 /api/v1/blog/")
         return {"message": "blog updated"}
@@ -79,10 +79,10 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_blog(blog: BlogDelete, db: Session = Depends(get_db)):
-    row = DB.get_blog_by_id(db, blog.id)
+    row = await DB.get_blog_by_id(db, blog.id)
 
     if row:
-        DB.delete_blog(db, row)
+        await DB.delete_blog(db, row)
 
         logging.info("DELETE 200 /api/v1/blog/")
         return {"message": "blog deleted"}

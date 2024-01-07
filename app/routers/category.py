@@ -29,7 +29,7 @@ class CategoryDelete(BaseModel):
 async def get_categories(db: Session = Depends(get_db)):
     categoriesList = []
 
-    categories = DB.get_all_categories(db)
+    categories = await DB.get_all_categories(db)
 
     for category in categories:
         categoriesList.append({
@@ -45,7 +45,7 @@ async def get_categories(db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
-    DB.add_category(db, category.title, category.index, category.type)
+    await DB.add_category(db, category.title, category.index, category.type)
 
     logging.info("POST 200 /api/v1/category/")
     return {"message": "category added"}
@@ -53,10 +53,10 @@ async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_category(category: CategoryUpdate, db: Session = Depends(get_db)):
-    row = DB.get_category_by_id(db, category.id)
+    row = await DB.get_category_by_id(db, category.id)
 
     if row:
-        DB.update_category(db, row, category.title, category.index, category.type)
+        await DB.update_category(db, row, category.title, category.index, category.type)
 
         logging.info("PUT 200 /api/v1/category/")
         return {"message": "category updated"}
@@ -67,10 +67,10 @@ async def update_category(category: CategoryUpdate, db: Session = Depends(get_db
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_category(category: CategoryDelete, db: Session = Depends(get_db)):
-    row = DB.get_category_by_id(db, category.id)
+    row = await DB.get_category_by_id(db, category.id)
 
     if row:
-        DB.delete_category(db, row)
+        await DB.delete_category(db, row)
 
         logging.info("DELETE 200 /api/v1/category/")
         return {"message": "category deleted"}

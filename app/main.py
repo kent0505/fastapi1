@@ -9,8 +9,8 @@ from app.routers.image       import router as image_router
 from app.home                import router as home_router
 from app.logs                import router as logs_router
 from app.config              import *
-import os
-import logging
+import os, logging
+
 
 os.makedirs("static", exist_ok=True)
 

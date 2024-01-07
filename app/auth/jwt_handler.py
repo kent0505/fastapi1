@@ -1,6 +1,5 @@
-import time
-import jwt
 from app.config import *
+import time, jwt
 
 def signJWT(id: str, role: str):
     expiry = time.time() + 60 * 60 * EXPIRY

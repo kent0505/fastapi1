@@ -30,9 +30,9 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     contentList = []
 
     if blog_id == 0:
-        contents = DB.get_all_contents(db)
+        contents = await DB.get_all_contents(db)
     else:
-        contents = DB.get_all_contents_by_blog_id(db, blog_id)
+        contents = await DB.get_all_contents_by_blog_id(db, blog_id)
 
     for content in contents:
         contentList.append({
@@ -49,10 +49,10 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
 
 @router.post("/", dependencies=[Depends(JwtBearer())])
 async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
-    row = DB.get_content_by_blog_id(db, content.blog_id)
+    row = await DB.get_content_by_blog_id(db, content.blog_id)
 
     if row:
-        DB.add_content(db, content.title, content.index, 0, content.blog_id)
+        await DB.add_content(db, content.title, content.index, 0, content.blog_id)
 
         logging.info("POST 200 /api/v1/content/")
         return {"message": "content added"}
@@ -63,10 +63,10 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
-    row = DB.get_content_by_id(db, content.id)
+    row = await DB.get_content_by_id(db, content.id)
 
     if row:
-        DB.update_content(db, row, content.title, content.index)
+        await DB.update_content(db, row, content.title, content.index)
 
         logging.info("PUT 200 /api/v1/content/")
         return {"message": "content updated"}
@@ -77,12 +77,12 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
 
 @router.delete("/", dependencies=[Depends(JwtBearer())])
 async def delete_content(content: ContentDelete, db: Session = Depends(get_db)):
-    row = DB.get_content_by_id(db, content.id)
+    row = await DB.get_content_by_id(db, content.id)
 
     if row:
         remove_image(row.title)
 
-        DB.delete_content(db, row)
+        await DB.delete_content(db, row)
 
         logging.info("DELETE 200 /api/v1/content/")
         return {"message": "content deleted"}

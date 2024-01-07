@@ -1,10 +1,12 @@
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from .jwt_handler import decodeJWT
+from app.auth.jwt_handler import decodeJWT
+
 
 class JwtBearer(HTTPBearer):
     def __init__(self, auto_Error: bool=True):
         super(JwtBearer, self).__init__(auto_error=auto_Error)
+
 
     async def __call__(self, request: Request):
         credentials: HTTPAuthorizationCredentials = await super(JwtBearer, self).__call__(request)
@@ -17,6 +19,7 @@ class JwtBearer(HTTPBearer):
         else:
             raise HTTPException(status_code=403, detail="invalid authorization code")
 
+
     def verify_jwt(self, token: str):
         valid: bool = False
         try:
@@ -26,6 +29,7 @@ class JwtBearer(HTTPBearer):
         if payload["role"] == "admin":
             valid = True
         return valid
+
 
 # class UserJwtBearer(HTTPBearer):
 #     def __init__(self, auto_Error: bool=True):
