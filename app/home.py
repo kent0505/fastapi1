@@ -4,7 +4,7 @@ from sqlalchemy.orm     import Session
 from app.database       import get_db
 from app.utils          import formatted_date
 from app.config         import *
-import app.crud as DB
+import app.crud as crud
 import logging, markdown
 
 
@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 async def home_page(request: Request, db: Session = Depends(get_db)):
     categories = []
 
-    categories = await DB.get_all_categories(db)
+    categories = await crud.get_all_categories(db)
         
     logging.info("GET 200 /")
     return templates.TemplateResponse("index.html", {
@@ -34,10 +34,10 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
 
     blogs = []
 
-    row = await DB.get_category_by_title(db, category)
+    row = await crud.get_category_by_title(db, category)
 
     if row:
-        blogs = await DB.get_all_blogs_by_category_id(db, row.id)
+        blogs = await crud.get_all_blogs_by_category_id(db, row.id)
 
         logging.info(f"GET 200 /{category}/")
         return templates.TemplateResponse("index.html", {
@@ -58,11 +58,11 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
 
     contents = []
 
-    db_category = await DB.get_category_by_title(db, category)
-    db_blog = await DB.get_blog_by_id(db, blog)
+    db_category = await crud.get_category_by_title(db, category)
+    db_blog = await crud.get_blog_by_id(db, blog)
 
     if db_category and db_blog:
-        contents = await DB.get_all_contents_by_blog_id(db, db_blog.id)
+        contents = await crud.get_all_contents_by_blog_id(db, db_blog.id)
 
         date = formatted_date(db_blog.date)
 

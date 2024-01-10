@@ -1,36 +1,19 @@
 from fastapi             import APIRouter, HTTPException, Depends
-from pydantic            import BaseModel
 from sqlalchemy.orm      import Session
-from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
-from app.utils           import get_timestamp
-import app.crud as DB
+from app.schemas         import *
+import app.crud as crud
 import logging
 
 
 router = APIRouter()
 
 
-class BlogAdd(BaseModel):
-    title:       str
-    index:       int
-    category_id: int
-
-class BlogUpdate(BaseModel):
-    id:          int
-    title:       str
-    index:       int
-    category_id: int
-
-class BlogDelete(BaseModel):
-    id: int
-
-
 @router.get("/")
 async def get_blogs(db: Session = Depends(get_db)):
     blogList = []
 
-    blogs = await DB.get_all_blogs(db)
+    blogs = await crud.get_all_blogs(db)
 
     for blog in blogs:
         blogList.append({
@@ -45,14 +28,12 @@ async def get_blogs(db: Session = Depends(get_db)):
     return {"blog": blogList}
 
 
-@router.post("/", dependencies=[Depends(JwtBearer())])
+@router.post("/")
 async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
-    row = await DB.get_blog_by_category_id(db, blog.category_id)
+    row = await crud.get_blog_by_category_id(db, blog.category_id)
 
     if row:
-        timestamp = get_timestamp()
-
-        await DB.add_blog(db, blog.title, blog.index, timestamp, blog.category_id)
+        await crud.add_blog(db, blog)
 
         logging.info("POST 200 /api/v1/blog/")
         return {"message": "blog added"}
@@ -61,14 +42,12 @@ async def add_blog(blog: BlogAdd, db: Session = Depends(get_db)):
     raise HTTPException(404, "id not found")
 
 
-@router.put("/", dependencies=[Depends(JwtBearer())])
+@router.put("/")
 async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
-    row = await DB.get_blog_by_id(db, blog.id)
+    row = await crud.get_blog_by_id(db, blog.id)
 
     if row:
-        timestamp = get_timestamp()
-
-        await DB.update_blog(db, row, blog.title, blog.index, timestamp, blog.category_id)
+        await crud.update_blog(db, row, blog)
 
         logging.info("PUT 200 /api/v1/blog/")
         return {"message": "blog updated"}
@@ -77,12 +56,12 @@ async def update_blog(blog: BlogUpdate, db: Session = Depends(get_db)):
     raise HTTPException(404, "id not found")
 
 
-@router.delete("/", dependencies=[Depends(JwtBearer())])
+@router.delete("/")
 async def delete_blog(blog: BlogDelete, db: Session = Depends(get_db)):
-    row = await DB.get_blog_by_id(db, blog.id)
+    row = await crud.get_blog_by_id(db, blog.id)
 
     if row:
-        await DB.delete_blog(db, row)
+        await crud.delete_blog(db, row)
 
         logging.info("DELETE 200 /api/v1/blog/")
         return {"message": "blog deleted"}

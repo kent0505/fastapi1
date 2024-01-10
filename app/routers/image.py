@@ -1,13 +1,13 @@
 from fastapi             import APIRouter, UploadFile, HTTPException, Form, Depends
-from app.auth.jwt_bearer import JwtBearer
 from sqlalchemy.orm      import Session
 from app.database        import get_db
 from app.utils           import *
-import app.crud as DB
+from app.schemas         import *
+import app.crud as crud
 import logging
 
 
-router = APIRouter(dependencies=[Depends(JwtBearer())])
+router = APIRouter()
 
 
 @router.post("/")
@@ -19,12 +19,12 @@ async def upload_file(
     ):
 
     if file.filename and file.content_type.startswith("image/"):
-        row = await DB.get_content_by_blog_id(db, blog_id)
+        row = await crud.get_content_by_blog_id(db, blog_id)
 
         if row:
             unique_name = add_image(file)
 
-            await DB.add_content(db, unique_name, index, 1, blog_id)
+            await crud.add_image(db, unique_name, index, blog_id)
 
             logging.info("POST 200 /api/v1/upload/")
             return {"message": "image uploaded successfully"}
@@ -45,14 +45,14 @@ async def update_file(
     ):
 
     if file.filename and file.content_type.startswith("image/"):
-        row = await DB.get_content_by_id(db, id)
+        row = await crud.get_content_by_id(db, id)
 
         if row:
             remove_image(row.title)
 
             unique_name = add_image(file)
 
-            await DB.update_image(db, row, unique_name, index)
+            await crud.update_image(db, row, unique_name, index)
 
             logging.info("PUT 200 /api/v1/upload/")
             return {"message": "image updated successfully"}

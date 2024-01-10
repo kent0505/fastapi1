@@ -1,28 +1,13 @@
 from fastapi             import APIRouter, HTTPException, Depends
-from pydantic            import BaseModel
 from sqlalchemy.orm      import Session
-from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
+from app.schemas         import *
 from app.utils           import *
-import app.crud as DB
+import app.crud as crud
 import logging
 
 
 router = APIRouter()
-
-
-class ContentAdd(BaseModel):
-    title:   str
-    index:   int
-    blog_id: int
-
-class ContentUpdate(BaseModel):
-    id:    int
-    title: str
-    index: int
-
-class ContentDelete(BaseModel):
-    id: int
 
 
 @router.get("/{blog_id}")
@@ -30,9 +15,9 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     contentList = []
 
     if blog_id == 0:
-        contents = await DB.get_all_contents(db)
+        contents = await crud.get_all_contents(db)
     else:
-        contents = await DB.get_all_contents_by_blog_id(db, blog_id)
+        contents = await crud.get_all_contents_by_blog_id(db, blog_id)
 
     for content in contents:
         contentList.append({
@@ -47,12 +32,12 @@ async def get_contents(blog_id: int, db: Session = Depends(get_db)):
     return {"content": contentList}
 
 
-@router.post("/", dependencies=[Depends(JwtBearer())])
+@router.post("/")
 async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
-    row = await DB.get_content_by_blog_id(db, content.blog_id)
+    row = await crud.get_content_by_blog_id(db, content.blog_id)
 
     if row:
-        await DB.add_content(db, content.title, content.index, 0, content.blog_id)
+        await crud.add_content(db, content)
 
         logging.info("POST 200 /api/v1/content/")
         return {"message": "content added"}
@@ -61,12 +46,12 @@ async def add_content(content: ContentAdd, db: Session = Depends(get_db)):
     raise HTTPException(404, "id not found")
 
 
-@router.put("/", dependencies=[Depends(JwtBearer())])
+@router.put("/")
 async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
-    row = await DB.get_content_by_id(db, content.id)
+    row = await crud.get_content_by_id(db, content.id)
 
     if row:
-        await DB.update_content(db, row, content.title, content.index)
+        await crud.update_content(db, row, content)
 
         logging.info("PUT 200 /api/v1/content/")
         return {"message": "content updated"}
@@ -75,14 +60,14 @@ async def update_content(content: ContentUpdate, db: Session = Depends(get_db)):
     raise HTTPException(404, "id not found")
     
 
-@router.delete("/", dependencies=[Depends(JwtBearer())])
+@router.delete("/")
 async def delete_content(content: ContentDelete, db: Session = Depends(get_db)):
-    row = await DB.get_content_by_id(db, content.id)
+    row = await crud.get_content_by_id(db, content.id)
 
     if row:
         remove_image(row.title)
 
-        await DB.delete_content(db, row)
+        await crud.delete_content(db, row)
 
         logging.info("DELETE 200 /api/v1/content/")
         return {"message": "content deleted"}

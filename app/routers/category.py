@@ -1,35 +1,19 @@
 from fastapi             import APIRouter, HTTPException, Depends
-from pydantic            import BaseModel
 from sqlalchemy.orm      import Session
-from app.auth.jwt_bearer import JwtBearer
 from app.database        import get_db
-import app.crud as DB
+from app.schemas         import *
+import app.crud as crud
 import logging
 
 
 router = APIRouter()
 
 
-class CategoryAdd(BaseModel):
-    title: str
-    index: int
-    type:  int
-
-class CategoryUpdate(BaseModel):
-    id:    int
-    title: str
-    index: int
-    type:  int
-
-class CategoryDelete(BaseModel):
-    id: int
-
-
 @router.get("/")
 async def get_categories(db: Session = Depends(get_db)):
     categoriesList = []
 
-    categories = await DB.get_all_categories(db)
+    categories = await crud.get_all_categories(db)
 
     for category in categories:
         categoriesList.append({
@@ -43,20 +27,20 @@ async def get_categories(db: Session = Depends(get_db)):
     return {"category": categoriesList}
 
 
-@router.post("/", dependencies=[Depends(JwtBearer())])
+@router.post("/")
 async def add_category(category: CategoryAdd, db: Session = Depends(get_db)):
-    await DB.add_category(db, category.title, category.index, category.type)
+    await crud.add_category(db, category)
 
     logging.info("POST 200 /api/v1/category/")
     return {"message": "category added"}
 
 
-@router.put("/", dependencies=[Depends(JwtBearer())])
+@router.put("/")
 async def update_category(category: CategoryUpdate, db: Session = Depends(get_db)):
-    row = await DB.get_category_by_id(db, category.id)
+    row = await crud.get_category_by_id(db, category.id)
 
     if row:
-        await DB.update_category(db, row, category.title, category.index, category.type)
+        await crud.update_category(db, row, category)
 
         logging.info("PUT 200 /api/v1/category/")
         return {"message": "category updated"}
@@ -65,12 +49,12 @@ async def update_category(category: CategoryUpdate, db: Session = Depends(get_db
     raise HTTPException(404, "id not found")
 
 
-@router.delete("/", dependencies=[Depends(JwtBearer())])
+@router.delete("/")
 async def delete_category(category: CategoryDelete, db: Session = Depends(get_db)):
-    row = await DB.get_category_by_id(db, category.id)
+    row = await crud.get_category_by_id(db, category.id)
 
     if row:
-        await DB.delete_category(db, row)
+        await crud.delete_category(db, row)
 
         logging.info("DELETE 200 /api/v1/category/")
         return {"message": "category deleted"}
