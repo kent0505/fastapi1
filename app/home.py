@@ -72,7 +72,7 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
             if content.image == 0:
                 body += f"{content.title}<br><br>"
             else:
-                body += f"![]({URL}/images/{content.title}/)<br><br>"
+                body += f"![]({URL}/images/{content.title})<br><br>"
             
         logging.info(f"GET 200 /{category}/{blog}/")
         return templates.TemplateResponse("index.html", {

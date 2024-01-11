@@ -35,7 +35,7 @@ app.add_middleware(
 app.mount(path="/images",    app=StaticFiles(directory="static"),    name="static")
 app.mount(path="/templates", app=StaticFiles(directory="templates"), name="templates")
 
-app.include_router(home_router,     prefix="",                 tags=["Home"])
+app.include_router(home_router,                                tags=["Home"])
 app.include_router(user_router,     prefix="/api/v1/user",     tags=["Users"])
 app.include_router(category_router, prefix="/api/v1/category", tags=["Category"], dependencies=[Depends(JwtBearer())])
 app.include_router(blog_router,     prefix="/api/v1/blog",     tags=["Blog"],     dependencies=[Depends(JwtBearer())])
