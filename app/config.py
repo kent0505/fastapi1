@@ -7,3 +7,4 @@ PASSWORD  = "111" # admin password
 KEY       = "" # jwt secret key
 ALGORITHM = "HS256" # jwt algorithm
 EXPIRY    = 24 # jwt expiry
+FILENAME  = ""
