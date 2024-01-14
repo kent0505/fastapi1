@@ -1,11 +1,13 @@
-from fastapi            import APIRouter, Request, HTTPException, Depends
-from fastapi.templating import Jinja2Templates
-from sqlalchemy.orm     import Session
-from app.database       import get_db
-from app.utils          import formatted_date
-from app.config         import *
+from fastapi                import APIRouter, Request, HTTPException, Depends
+from fastapi.templating     import Jinja2Templates
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.database           import get_db
+from app.utils              import *
+from app.config             import *
+
 import app.crud as crud
-import logging, markdown
+import markdown
 
 
 router = APIRouter()
@@ -13,12 +15,12 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/")
-async def home_page(request: Request, db: Session = Depends(get_db)):
+async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
     categories = []
 
     categories = await crud.get_all_categories(db)
-        
-    logging.info("GET 200 /")
+
+    log("GET 200 /")
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "title":      "Категории",
@@ -29,7 +31,7 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
 
 
 @router.get("/{category}")
-async def blogs_page(request: Request, category: str, db: Session = Depends(get_db)):
+async def blogs_page(request: Request, category: str, db: AsyncSession = Depends(get_db)):
     category = category.replace("-", " ")
 
     blogs = []
@@ -37,9 +39,9 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
     row = await crud.get_category_by_title(db, category)
 
     if row:
-        blogs = await crud.get_all_blogs_by_category_id(db, row.id)
+        blogs = await crud.get_all_blogs_by_cid(db, row.id)
 
-        logging.info(f"GET 200 /{category}/")
+        log(f"GET 200 /{category}/")
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
@@ -47,13 +49,13 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "url":     URL,
             "blogs":   blogs,
         })
-    
-    logging.error(f"GET 404 /{category}/")
+
+    log(f"GET 404 /{category}/")
     raise HTTPException(404, "Not found")
 
 
 @router.get("/{category}/{blog}")
-async def blogs_page(request: Request, category: str, blog: int, db: Session = Depends(get_db)):
+async def blogs_page(request: Request, category: str, blog: int, db: AsyncSession = Depends(get_db)):
     category = category.replace("-", " ")
 
     contents = []
@@ -62,7 +64,7 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
     db_blog = await crud.get_blog_by_id(db, blog)
 
     if db_category and db_blog:
-        contents = await crud.get_all_contents_by_blog_id(db, db_blog.id)
+        contents = await crud.get_all_contents_by_bid(db, db_blog.id)
 
         date = formatted_date(db_blog.date)
 
@@ -73,8 +75,8 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
                 body += f"{content.title}<br><br>"
             else:
                 body += f"![]({URL}/images/{content.title})<br><br>"
-            
-        logging.info(f"GET 200 /{category}/{blog}/")
+
+        log(f"GET 200 /{category}/{blog}/")
         return templates.TemplateResponse("index.html", {
             "request":  request,
             "title":    db_blog.title,
@@ -83,6 +85,6 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
             "url":      URL,
             "contents": markdown.markdown(body),
         })
-    
-    logging.error(f"GET 404 /{category}/{blog}/")
+
+    log(f"GET 404 /{category}/{blog}/")
     raise HTTPException(404, "Not found")

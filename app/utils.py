@@ -1,6 +1,10 @@
 from fastapi  import UploadFile
 from datetime import datetime
-import os, time, logging, bcrypt
+
+import os
+import time
+import logging
+import bcrypt
 
 
 def get_timestamp():
@@ -46,3 +50,10 @@ def hash_password(password: str):
 def check_password(password1: str, password2: str):
     hashed = bcrypt.checkpw(password1.encode("utf-8"), password2.encode("utf-8"))
     return hashed
+
+
+def log(msg: str):
+    if "200" in msg:
+        logging.info(msg)
+    elif "404" or "400" in msg:
+        logging.error(msg)

@@ -1,5 +1,8 @@
 from app.config import *
-import time, jwt
+
+import time
+import jwt
+
 
 def signJWT(id: str, role: str):
     expiry = time.time() + 60 * 60 * EXPIRY
@@ -9,6 +12,7 @@ def signJWT(id: str, role: str):
         key=KEY,
         algorithm=ALGORITHM,
     )
+
 
 def decodeJWT(token: str):
     try:

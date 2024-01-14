@@ -1,8 +1,9 @@
 from fastapi              import APIRouter, HTTPException
+
 from app.auth.jwt_handler import signJWT
 from app.schemas          import *
 from app.config           import *
-import logging
+from app.utils            import *
 
 
 router = APIRouter()
@@ -11,10 +12,10 @@ router = APIRouter()
 @router.post("/login")
 async def login(user: UserModel):
     if user.username.lower() == USERNAME and user.password == PASSWORD:
-        logging.info("POST 200 /api/v1/user/login/")
+        log("POST 200 /api/v1/user/login/")
         return {"access_token": signJWT(user.username, "admin")}
 
-    logging.error("POST 401 /api/v1/user/login/")
+    log(f"POST 401 /api/v1/user/login/ {user.username} {user.password}")
     raise HTTPException(401, "username or password invalid")
 
 

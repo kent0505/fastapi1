@@ -1,46 +1,50 @@
-from sqlalchemy                 import Column, Integer, String, create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm             import sessionmaker
+from sqlalchemy.orm         import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-engine = create_engine("sqlite:///./test.db", connect_args={"check_same_thread": False})
-# engine = create_engine("postgresql+psycopg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-SessionLocal = sessionmaker(autoflush=False, bind=engine)
-Base = declarative_base()
+
+engine = create_async_engine("sqlite+aiosqlite:///./test.db", connect_args={"check_same_thread": False})
+SessionLocal = async_sessionmaker(autoflush=False, bind=engine)
+
+
+class Base(DeclarativeBase):
+    pass
+
 
 class User(Base):
     __tablename__ = "users"
-    id       = Column(Integer, primary_key=True, index=True)
-    username = Column(String,  nullable=False)
-    password = Column(String,  nullable=False)
+    id:       Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False)
 
 class Category(Base):
     __tablename__ = "categories"
-    id    = Column(Integer, primary_key=True, index=True)
-    title = Column(String,  nullable=False)
-    index = Column(Integer, nullable=False)
-    type  = Column(Integer, nullable=False)
+    id:    Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    index: Mapped[int] = mapped_column(nullable=False)
+    type:  Mapped[int] = mapped_column(nullable=False)
 
 class Blog(Base):
     __tablename__ = "blogs"
-    id          = Column(Integer, primary_key=True, index=True)
-    title       = Column(String,  nullable=False)
-    index       = Column(Integer, nullable=False)
-    date        = Column(Integer, nullable=False)
-    category_id = Column(Integer, nullable=False)
+    id:    Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    index: Mapped[int] = mapped_column(nullable=False)
+    date:  Mapped[int] = mapped_column(nullable=False)
+    cid:   Mapped[int] = mapped_column(nullable=False)
 
 class Content(Base):
     __tablename__ = "contents"
-    id      = Column(Integer, primary_key=True, index=True)
-    title   = Column(String,  nullable=False)
-    index   = Column(Integer, nullable=False)
-    image   = Column(Integer, nullable=False)
-    blog_id = Column(Integer, nullable=False)
+    id:    Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(nullable=False)
+    index: Mapped[int] = mapped_column(nullable=False)
+    image: Mapped[int] = mapped_column(nullable=False)
+    bid:   Mapped[int] = mapped_column(nullable=False)
 
-Base.metadata.create_all(bind=engine)
 
-def get_db():
+async def get_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
     db = SessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()

@@ -34,16 +34,16 @@ class CategoryDelete(BaseModel):
 
 
 class BlogAdd(BaseModel):
-    title:       str
-    index:       int
-    category_id: int
+    title: str
+    index: int
+    cid:   int
 
 
 class BlogUpdate(BaseModel):
-    id:          int
-    title:       str
-    index:       int
-    category_id: int
+    id:    int
+    title: str
+    index: int
+    cid:   int
 
 
 class BlogDelete(BaseModel):
@@ -51,9 +51,9 @@ class BlogDelete(BaseModel):
 
 
 class ContentAdd(BaseModel):
-    title:   str
-    index:   int
-    blog_id: int
+    title: str
+    index: int
+    bid:   int
 
 
 class ContentUpdate(BaseModel):
