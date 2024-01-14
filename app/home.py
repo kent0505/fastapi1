@@ -18,7 +18,7 @@ async def home_page(request: Request, db: Session = Depends(get_db)):
 
     categories = await crud.get_all_categories(db)
         
-    logging.info(f"GET 200 / {request.client.host}")
+    logging.info("GET 200 /")
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "title":      "Категории",
@@ -39,7 +39,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
     if row:
         blogs = await crud.get_all_blogs_by_category_id(db, row.id)
 
-        logging.info(f"GET 200 /{category}/ {request.client.host}")
+        logging.info(f"GET 200 /{category}/")
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
@@ -48,7 +48,7 @@ async def blogs_page(request: Request, category: str, db: Session = Depends(get_
             "blogs":   blogs,
         })
     
-    logging.error(f"GET 404 /{category}/ {request.client.host}")
+    logging.error(f"GET 404 /{category}/")
     raise HTTPException(404, "Not found")
 
 
@@ -74,7 +74,7 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
             else:
                 body += f"![]({URL}/images/{content.title})<br><br>"
             
-        logging.info(f"GET 200 /{category}/{blog}/ {request.client.host}")
+        logging.info(f"GET 200 /{category}/{blog}/")
         return templates.TemplateResponse("index.html", {
             "request":  request,
             "title":    db_blog.title,
@@ -84,5 +84,5 @@ async def blogs_page(request: Request, category: str, blog: int, db: Session = D
             "contents": markdown.markdown(body),
         })
     
-    logging.error(f"GET 404 /{category}/{blog}/ {request.client.host}")
+    logging.error(f"GET 404 /{category}/{blog}/")
     raise HTTPException(404, "Not found")
