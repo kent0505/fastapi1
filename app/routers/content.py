@@ -61,17 +61,17 @@ async def update_content(content: ContentUpdate, db: AsyncSession = Depends(get_
     raise HTTPException(404, "id not found")
     
 
-@router.delete("/")
-async def delete_content(content: ContentDelete, db: AsyncSession = Depends(get_db)):
-    row = await crud.get_content_by_id(db, content.id)
+@router.delete("/{id}")
+async def delete_content(id: int, db: AsyncSession = Depends(get_db)):
+    row = await crud.get_content_by_id(db, id)
 
     if row:
         remove_image(row.title)
 
         await crud.delete_content(db, row)
 
-        log(f"DELETE 200 /api/v1/content/ {content.id}")
+        log(f"DELETE 200 /api/v1/content/ {id}")
         return {"message": "content deleted"}
 
-    log(f"DELETE 404 /api/v1/content/ {content.id}")
+    log(f"DELETE 404 /api/v1/content/ {id}")
     raise HTTPException(404, "id not found")

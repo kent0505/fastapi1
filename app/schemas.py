@@ -12,10 +12,6 @@ class UserUpdateModel(BaseModel):
     password: str
 
 
-class UserDeleteModel(BaseModel):
-    id: int
-
-
 class CategoryAdd(BaseModel):
     title: str
     index: int
@@ -27,10 +23,6 @@ class CategoryUpdate(BaseModel):
     title: str
     index: int
     type:  int
-
-
-class CategoryDelete(BaseModel):
-    id: int
 
 
 class BlogAdd(BaseModel):
@@ -46,10 +38,6 @@ class BlogUpdate(BaseModel):
     cid:   int
 
 
-class BlogDelete(BaseModel):
-    id: int
-
-
 class ContentAdd(BaseModel):
     title: str
     index: int
@@ -60,7 +48,3 @@ class ContentUpdate(BaseModel):
     id:    int
     title: str
     index: int
-
-
-class ContentDelete(BaseModel):
-    id: int

@@ -11,7 +11,8 @@ router = APIRouter()
 
 @router.post("/login")
 async def login(user: UserModel):
-    if user.username.lower() == USERNAME and user.password == PASSWORD:
+    hashed = check_password(user.password, PASSWORD)
+    if user.username.lower() == USERNAME and hashed:
         log("POST 200 /api/v1/user/login/")
         return {"access_token": signJWT(user.username, "admin")}
 
@@ -89,15 +90,15 @@ async def login(user: UserModel):
 #     raise HTTPException(404, "user not found")
 
 
-# @router.delete("/", dependencies=[Depends(JwtBearer())])
-# async def delete_user(user: UserDeleteModel, db: Session = Depends(get_db)):
-#     row = await crud.get_user_by_id(db, user.id)
+# @router.delete("/{id}", dependencies=[Depends(JwtBearer())])
+# async def delete_user(id: int, db: Session = Depends(get_db)):
+#     row = await crud.get_user_by_id(db, id)
 
 #     if row:
 #         await crud.delete_user(db, row)
 
-#         logging.info(f"DELETE 200 /api/v1/user/")
+#         logging.info(f"DELETE 200 /api/v1/user/ {id}")
 #         return {"message": "user deleted"}
 
-#     logging.error(f"DELETE 404 /api/v1/user/ NOT FOUND")
+#     logging.error(f"DELETE 404 /api/v1/user/ {id}")
 #     raise HTTPException(404, "user not found")

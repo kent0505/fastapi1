@@ -5,12 +5,12 @@ import jwt
 
 
 def signJWT(id: str, role: str):
-    expiry = time.time() + 60 * 60 * EXPIRY
+    expiry = time.time() + 60 * 60 * 24 # 24 hours
 
     return jwt.encode(
         payload={"id": id, "role": role, "expiry": expiry}, 
         key=KEY,
-        algorithm=ALGORITHM,
+        algorithm="HS256",
     )
 
 
@@ -19,7 +19,7 @@ def decodeJWT(token: str):
         decoded_token = jwt.decode(
             jwt=token, 
             key=KEY, 
-            algorithms=[ALGORITHM]
+            algorithms=["HS256"]
         )
         if decoded_token["expiry"] >= time.time():
             return decoded_token

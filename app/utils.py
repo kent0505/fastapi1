@@ -48,12 +48,17 @@ def hash_password(password: str):
 
 
 def check_password(password1: str, password2: str):
-    hashed = bcrypt.checkpw(password1.encode("utf-8"), password2.encode("utf-8"))
-    return hashed
+    try:
+        hashed = bcrypt.checkpw(password1.encode("utf-8"), password2.encode("utf-8"))
+        return hashed
+    except:
+        return False
 
 
 def log(msg: str):
     if "200" in msg:
         logging.info(msg)
-    elif "404" or "400" in msg:
+    elif "400" or "401" or "402" or "403" or "404" in msg:
         logging.error(msg)
+    else:
+        logging.critical(msg)

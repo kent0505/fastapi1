@@ -58,15 +58,15 @@ async def update_blog(blog: BlogUpdate, db: AsyncSession = Depends(get_db)):
     raise HTTPException(404, "id not found")
 
 
-@router.delete("/")
-async def delete_blog(blog: BlogDelete, db: AsyncSession = Depends(get_db)):
-    row = await crud.get_blog_by_id(db, blog.id)
+@router.delete("/{id}")
+async def delete_blog(id: int, db: AsyncSession = Depends(get_db)):
+    row = await crud.get_blog_by_id(db, id)
 
     if row:
         await crud.delete_blog(db, row)
 
-        log(f"DELETE 200 /api/v1/blog/ {blog.id}")
+        log(f"DELETE 200 /api/v1/blog/ {id}")
         return {"message": "blog deleted"}
     
-    log(f"DELETE 404 /api/v1/blog/ {blog.id}")
+    log(f"DELETE 404 /api/v1/blog/ {id}")
     raise HTTPException(404, "id not found")

@@ -51,15 +51,15 @@ async def update_category(category: CategoryUpdate, db: AsyncSession = Depends(g
     raise HTTPException(404, "id not found")
 
 
-@router.delete("/")
-async def delete_category(category: CategoryDelete, db: AsyncSession = Depends(get_db)):
-    row = await crud.get_category_by_id(db, category.id)
+@router.delete("/{id}")
+async def delete_category(id: int, db: AsyncSession = Depends(get_db)):
+    row = await crud.get_category_by_id(db, id)
 
     if row:
         await crud.delete_category(db, row)
 
-        log(f"DELETE 200 /api/v1/category/ {category.id}")
+        log(f"DELETE 200 /api/v1/category/ {id}")
         return {"message": "category deleted"}
     
-    log(f"DELETE 404 /api/v1/category/ {category.id}")
+    log(f"DELETE 404 /api/v1/category/ {id}")
     raise HTTPException(404, "id not found")
