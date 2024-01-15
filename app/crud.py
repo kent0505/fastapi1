@@ -10,7 +10,7 @@ import time
 
 
 async def get_all_categories(db: AsyncSession):
-    result:             Result = await db.execute(select(Category).order_by(desc(Category.index)))
+    result:     Result         = await db.execute(select(Category).order_by(desc(Category.index)))
     categories: List[Category] = result.scalars().all()
     return categories
 
