@@ -8,8 +8,6 @@ router = APIRouter()
 
 @router.get("/last")
 async def get_last_logs():
-    log("GET 200 /api/v1/logs/last/")
-
     with open("logfile.log", "r") as file:
         lines = file.readlines()
         line_count = len(lines)
@@ -30,5 +28,4 @@ async def delete_logs():
     with open("logfile.log", "w"):
         pass
 
-    log("GET 200 /api/v1/logs/delete/")
     return {"message": "logs deleted"}

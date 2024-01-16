@@ -26,7 +26,6 @@ async def get_blogs(db: AsyncSession = Depends(get_db)):
             "cid":   blog.cid,
         })
 
-    log("GET 200 /api/v1/blog/")
     return {"blog": blogList}
 
 
@@ -37,10 +36,8 @@ async def add_blog(blog: BlogAdd, db: AsyncSession = Depends(get_db)):
     if row:
         await crud.add_blog(db, blog)
 
-        log(f"POST 200 /api/v1/blog/ {blog.cid}")
         return {"message": "blog added"}
-    
-    log(f"POST 404 /api/v1/blog/ {blog.cid}")
+
     raise HTTPException(404, "id not found")
 
 
@@ -51,10 +48,8 @@ async def update_blog(blog: BlogUpdate, db: AsyncSession = Depends(get_db)):
     if row:
         await crud.update_blog(db, row, blog)
 
-        log(f"PUT 200 /api/v1/blog/ {blog.id}")
         return {"message": "blog updated"}
-    
-    log(f"PUT 404 /api/v1/blog/ {blog.id}")
+
     raise HTTPException(404, "id not found")
 
 
@@ -65,8 +60,6 @@ async def delete_blog(id: int, db: AsyncSession = Depends(get_db)):
     if row:
         await crud.delete_blog(db, row)
 
-        log(f"DELETE 200 /api/v1/blog/ {id}")
         return {"message": "blog deleted"}
-    
-    log(f"DELETE 404 /api/v1/blog/ {id}")
+
     raise HTTPException(404, "id not found")

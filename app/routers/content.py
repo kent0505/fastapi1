@@ -29,7 +29,6 @@ async def get_contents(bid: int, db: AsyncSession = Depends(get_db)):
             "bid":   content.bid
         })
 
-    log(f"GET 200 /api/v1/content/{bid}/")
     return {"content": contentList}
 
 
@@ -40,10 +39,8 @@ async def add_content(content: ContentAdd, db: AsyncSession = Depends(get_db)):
     if row:
         await crud.add_content(db, content)
 
-        log(f"POST 200 /api/v1/content/ {content.bid}")
         return {"message": "content added"}
-    
-    log(f"POST 404 /api/v1/content/ {content.bid}")
+
     raise HTTPException(404, "id not found")
 
 
@@ -54,10 +51,8 @@ async def update_content(content: ContentUpdate, db: AsyncSession = Depends(get_
     if row:
         await crud.update_content(db, row, content)
 
-        log(f"PUT 200 /api/v1/content/ {content.id}")
         return {"message": "content updated"}
 
-    log(f"PUT 404 /api/v1/content/ {content.id}")
     raise HTTPException(404, "id not found")
     
 
@@ -70,8 +65,6 @@ async def delete_content(id: int, db: AsyncSession = Depends(get_db)):
 
         await crud.delete_content(db, row)
 
-        log(f"DELETE 200 /api/v1/content/ {id}")
         return {"message": "content deleted"}
 
-    log(f"DELETE 404 /api/v1/content/ {id}")
     raise HTTPException(404, "id not found")

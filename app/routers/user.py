@@ -1,59 +1,69 @@
-from fastapi              import APIRouter, HTTPException
+from fastapi                import APIRouter, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.jwt_handler import signJWT
-from app.schemas          import *
-from app.config           import *
-from app.utils            import *
+from app.auth.jwt_bearer    import JwtBearer
+from app.auth.jwt_handler   import signJWT
+from app.database           import get_db
+from app.schemas            import *
+from app.config             import *
+from app.utils              import *
+
+import app.crud as crud
 
 
 router = APIRouter()
 
 
 @router.post("/login")
-async def login(user: UserModel):
-    hashed = check_password(user.password, PASSWORD)
-    if user.username.lower() == USERNAME and hashed:
-        log("POST 200 /api/v1/user/login/")
-        return {"access_token": signJWT(user.username, "admin")}
+async def login(user: UserModel, db: AsyncSession = Depends(get_db)):
+    row = await crud.get_user_by_username(db, user.username)
 
-    log(f"POST 401 /api/v1/user/login/ {user.username} {user.password}")
+    if row:
+        hashed = check_password(user.password, row.password)
+
+        if hashed and row.username == user.username:
+            return {"access_token": signJWT(user.username, "admin")}
+
     raise HTTPException(401, "username or password invalid")
 
 
-# @router.post("/login")
-# async def login(user: UserModel, db: Session = Depends(get_db)):
-#     if user.username.lower() == USERNAME and user.password == PASSWORD:
-#         logging.info("POST 200 /api/v1/user/login/")
-#         return {"access_token": signJWT(user.username, "admin")}
+@router.post("/register")
+async def register(user: UserModel, db: AsyncSession = Depends(get_db)):
+    users = await crud.get_all_users(db)
+    if users != []:
+        raise HTTPException(409, "admin already exists")
 
-#     row = await crud.get_user_by_username(db, user.username)
+    # row = await crud.get_user_by_username(db, user)
 
-#     if row:
-#         hashed = check_password(user.password, row.password)
+    # if row or user.username.lower() == "admin":
+    #     raise HTTPException(409, "this username already exists")
 
-#         if hashed and row.username == user.username:
-#             logging.info("POST 200 /api/v1/user/login/")
-#             return {"access_token": signJWT(user.username, "user")}
+    hashed_password = hash_password(user.password)
+    user.password = hashed_password
 
-#     logging.error("POST 401 /api/v1/user/login/")
-#     raise HTTPException(401, "username or password invalid")
+    await crud.add_user(db, user)
+
+    return {"message": "user added"}
 
 
-# @router.post("/register")
-# async def register(user: UserModel, db: Session = Depends(get_db)):
-#     row = await crud.get_user_by_username(db, user)
+@router.put("/", dependencies=[Depends(JwtBearer())])
+async def update_user(user: UserUpdateModel, db: AsyncSession = Depends(get_db)):
+    row = await crud.get_user_by_username(db, user.username)
 
-#     if row or user.username.lower() == "admin":
-#         logging.error("POST 409 /api/v1/user/register/")
-#         raise HTTPException(409, "this username already exists")
+    if row and user.new_username != "" or user.new_password != "":
+        hashed = check_password(user.password, row.password)
 
-#     hashed = hash_password(user.password)
-#     user.password = hashed
+        if hashed:
+            hashed_password = hash_password(user.new_password)
+            user.new_password = hashed_password
 
-#     await crud.add_user(db, user)
+            await crud.update_user(db, row, user)
 
-#     logging.info("POST 200 /api/v1/user/register/")
-#     return {"message": "user added"}
+            return {"message": "user updated"}
+
+        raise HTTPException(401, "username or password invalid")
+
+    raise HTTPException(404, "user not found")
 
 
 # @router.get("/", dependencies=[Depends(JwtBearer())])
@@ -73,23 +83,6 @@ async def login(user: UserModel):
 #     return {"users": usersList}
 
 
-# @router.put("/", dependencies=[Depends(JwtBearer())])
-# async def update_user(user: UserUpdateModel, db: Session = Depends(get_db)):
-#     row = await crud.get_user_by_id(db, user.id)
-
-#     if row and user.username != "" or user.password != "" and user.username.lower() != "admin":
-#         hashed = hash_password(user.password)
-#         user.password = hashed
-
-#         await crud.update_user(db, row, user)
-
-#         logging.info("PUT 200 /api/v1/user/")
-#         return {"message": "user updated"}
-    
-#     logging.error("PUT 404 /api/v1/user/ NOT FOUND")
-#     raise HTTPException(404, "user not found")
-
-
 # @router.delete("/{id}", dependencies=[Depends(JwtBearer())])
 # async def delete_user(id: int, db: Session = Depends(get_db)):
 #     row = await crud.get_user_by_id(db, id)
@@ -102,3 +95,14 @@ async def login(user: UserModel):
 
 #     logging.error(f"DELETE 404 /api/v1/user/ {id}")
 #     raise HTTPException(404, "user not found")
+
+
+# @router.post("/login")
+# async def login(user: UserModel):
+#     hashed = check_password(user.password, PASSWORD)
+#     if user.username.lower() == USERNAME and hashed:
+#         log("POST 200 /api/v1/user/login/")
+#         return {"access_token": signJWT(user.username, "admin")}
+
+#     log(f"POST 401 /api/v1/user/login/ {user.username} {user.password}")
+#     raise HTTPException(401, "username or password invalid")

@@ -25,7 +25,6 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
             "type":  category.type
         })
 
-    log("GET 200 /api/v1/category/")
     return {"category": categoriesList}
 
 
@@ -33,7 +32,6 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
 async def add_category(category: CategoryAdd, db: AsyncSession = Depends(get_db)):
     await crud.add_category(db, category)
 
-    log("POST 200 /api/v1/category/")
     return {"message": "category added"}
 
 
@@ -44,10 +42,8 @@ async def update_category(category: CategoryUpdate, db: AsyncSession = Depends(g
     if row:
         await crud.update_category(db, row, category)
 
-        log(f"PUT 200 /api/v1/category/ {category.id}")
         return {"message": "category updated"}
 
-    log(f"PUT 404 /api/v1/category/ {category.id}")
     raise HTTPException(404, "id not found")
 
 
@@ -58,8 +54,6 @@ async def delete_category(id: int, db: AsyncSession = Depends(get_db)):
     if row:
         await crud.delete_category(db, row)
 
-        log(f"DELETE 200 /api/v1/category/ {id}")
         return {"message": "category deleted"}
-    
-    log(f"DELETE 404 /api/v1/category/ {id}")
+
     raise HTTPException(404, "id not found")

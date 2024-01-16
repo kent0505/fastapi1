@@ -7,9 +7,10 @@ class UserModel(BaseModel):
 
 
 class UserUpdateModel(BaseModel):
-    id:       int
     username: str
     password: str
+    new_username: str
+    new_password: str
 
 
 class CategoryAdd(BaseModel):

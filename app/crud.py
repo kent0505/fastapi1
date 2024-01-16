@@ -166,36 +166,36 @@ async def update_image(db: AsyncSession, content: Content, title: str, index: in
 ###
 
 
-# async def get_all_users(db: AsyncSession):
-#     result: Result = await db.execute(select(User))
-#     user:   User   = result.scalars().all()
-#     return user 
+async def get_all_users(db: AsyncSession):
+    result: Result     = await db.execute(select(User))
+    users:  List[User] = result.scalars().all()
+    return users 
 
 
-# async def get_user_by_id(db: AsyncSession, id: int):
-#     result: Result = await db.execute(select(User).filter(User.id == id))
-#     user:   User   = result.scalars().first()
-#     return user
+async def get_user_by_id(db: AsyncSession, id: int):
+    result: Result = await db.execute(select(User).filter(User.id == id))
+    user:   User   = result.scalars().first()
+    return user
 
 
-# async def get_user_by_username(db: AsyncSession, username: str):
-#     result: Result = await db.execute(select(User).filter(User.username == username))
-#     user:   User   = result.scalars().first()
-#     return user
+async def get_user_by_username(db: AsyncSession, username: str):
+    result: Result = await db.execute(select(User).filter(User.username == username))
+    user:   User   = result.scalars().first()
+    return user
 
 
-# async def add_user(db: AsyncSession, user: UserModel):
-#     db.add(User(
-#         username=user.username, 
-#         password=user.password,
-#     ))
-#     await db.commit()
+async def add_user(db: AsyncSession, user: UserModel):
+    db.add(User(
+        username=user.username, 
+        password=user.password,
+    ))
+    await db.commit()
 
 
-# async def update_user(db: AsyncSession, row: User, user: UserUpdateModel):
-#     row.username = user.username
-#     row.password = user.password
-#     await db.commit()
+async def update_user(db: AsyncSession, row: User, user: UserUpdateModel):
+    row.username = user.new_username
+    row.password = user.new_password
+    await db.commit()
 
 
 # async def delete_user(db: AsyncSession, user: User):

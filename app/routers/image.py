@@ -27,13 +27,10 @@ async def upload_file(
 
             await crud.add_image(db, unique_name, index, bid)
 
-            log(f"POST 200 /api/v1/upload/ {bid}")
             return {"message": "image uploaded successfully"}
 
-        log(f"POST 404 /api/v1/upload/ {bid}")
         raise HTTPException(404, "id not found")
 
-    log("POST 400 /api/v1/upload/ FILE ERROR")
     raise HTTPException(400, "file error")
 
 
@@ -55,11 +52,8 @@ async def update_file(
 
             await crud.update_image(db, row, unique_name, index)
 
-            log(f"PUT 200 /api/v1/upload/ {id}")
             return {"message": "image updated successfully"}
 
-        log(f"PUT 404 /api/v1/upload/ {id}")
         raise HTTPException(404, "id not found")
 
-    log("PUT 400 /api/v1/upload/ FILE ERROR")
     raise HTTPException(400, "file error")
