@@ -1,7 +1,6 @@
 from fastapi                 import FastAPI, Depends
 from fastapi.staticfiles     import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-
 from app.auth.jwt_bearer     import JwtBearer
 from app.routers.user        import router as user_router
 from app.routers.category    import router as category_router
@@ -11,9 +10,8 @@ from app.routers.image       import router as image_router
 from app.routers.logs        import router as logs_router
 from app.home                import router as home_router
 from app.config              import *
-
-import os
 import logging
+import os
 
 
 os.makedirs("static", exist_ok=True)
@@ -53,5 +51,5 @@ app.include_router(logs_router,     prefix="/api/v1/logs",     tags=["Logs"],   
 # app.include_router(image_router,    prefix="/api/v1/upload",   tags=["Image"])
 # app.include_router(logs_router,     prefix="/api/v1/logs",     tags=["Logs"])
 # pip install -r requirements.txt
-# cd desktop/backend/fastapi/test2 & venv\scripts\activate
+# cd desktop/backend/fastapi/test2 & source venv/bin/activate
 # uvicorn app.main:app --reload
