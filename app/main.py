@@ -14,6 +14,7 @@ import logging
 import os
 
 
+
 os.makedirs("static", exist_ok=True)
 
 logging.basicConfig(
