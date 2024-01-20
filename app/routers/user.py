@@ -1,13 +1,11 @@
 from fastapi                import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.auth.jwt_bearer    import JwtBearer
 from app.auth.jwt_handler   import signJWT
 from app.database           import get_db
 from app.schemas            import *
 from app.config             import *
 from app.utils              import *
-
 import app.crud as crud
 
 

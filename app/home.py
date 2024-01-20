@@ -1,11 +1,9 @@
 from fastapi                import APIRouter, Request, HTTPException, Depends
 from fastapi.templating     import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.database           import get_db
 from app.utils              import *
 from app.config             import *
-
 import app.crud as crud
 import markdown
 

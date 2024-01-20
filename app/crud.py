@@ -2,10 +2,8 @@ from sqlalchemy             import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.engine      import Result
 from typing                 import List
-
 from app.database           import *
 from app.schemas            import *
-
 import time
 
 
