@@ -59,7 +59,7 @@ async def blogs_page(request: Request, category: str, blog: int, db: AsyncSessio
     contents = []
 
     db_category = await crud.get_category_by_title(db, category)
-    db_blog = await crud.get_blog_by_id(db, blog)
+    db_blog     = await crud.get_blog_by_id(db, blog)
 
     if db_category and db_blog:
         contents = await crud.get_all_contents_by_bid(db, db_blog.id)
