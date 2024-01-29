@@ -60,7 +60,7 @@ def create_body(contents: List[Content]):
         if content.image == 0:
             body += f"{content.title}<br><br>"
         else:
-            body += f"![]({URL}images/{content.title}/)<br><br>"
+            body += f"![]({URL}/images/{content.title}/)<br><br>"
     body = markdown.markdown(body)
     return body
 
