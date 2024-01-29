@@ -20,6 +20,7 @@ async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "title":      "Категории",
+        "url":        URL,
         "index":      1,
         "categories": categories,
     })
@@ -37,6 +38,7 @@ async def blog_page(request: Request, category: str, db: AsyncSession = Depends(
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
+            "url":     URL,
             "index":   2,
             "blogs":   blogs,
         })
@@ -55,11 +57,12 @@ async def content_page(request: Request, category: str, blog: int, db: AsyncSess
         contents = await crud.get_all_contents_by_bid(db, db_blog.id)
 
         date = format_date(db_blog.date)
-        body = create_body(request, contents)
+        body = create_body(contents)
 
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   db_blog.title,
+            "url":     URL,
             "date":    date,
             "index":   3,
             "body":    body,

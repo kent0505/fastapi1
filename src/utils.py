@@ -4,6 +4,7 @@ from typing                    import List
 from http                      import HTTPStatus
 from datetime                  import datetime
 from src.database              import Content
+from src.config                import URL
 import os
 import time
 import logging
@@ -53,13 +54,13 @@ def remove_dash(data: str):
     return data.replace("-", " ")
 
 
-def create_body(request: Request, contents: List[Content]):
+def create_body(contents: List[Content]):
     body = ""
     for content in contents:
         if content.image == 0:
             body += f"{content.title}<br><br>"
         else:
-            body += f"![]({request.base_url}images/{content.title}/)<br><br>"
+            body += f"![]({URL}images/{content.title}/)<br><br>"
     body = markdown.markdown(body)
     return body
 
