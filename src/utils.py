@@ -105,4 +105,4 @@ def check_password(password1: str, password2: str):
 
 
 # def validation_exception_handler(request: Request, exc):
-#     raise HTTPException(422, "validation error")
+#     raise HTTPException(422, "Validation error")
