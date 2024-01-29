@@ -1,4 +1,3 @@
-from fastapi                   import HTTPException, Request
 from starlette.middleware.base import BaseHTTPMiddleware
 from src.utils                 import log
 from http                      import HTTPStatus
@@ -6,7 +5,6 @@ from http                      import HTTPStatus
 
 class LogMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-
         response = await call_next(request)
 
         method      = request.method
@@ -14,10 +12,6 @@ class LogMiddleware(BaseHTTPMiddleware):
         status_code = response.status_code
         code_desc   = HTTPStatus(status_code).phrase
 
-        print(f"{method} {url_path} {status_code} {code_desc}")
+        # print(f"{method} {url_path} {status_code} {code_desc}")
         log(f"{method} {url_path} {status_code} {code_desc}")
         return response
-
-
-def validation_exception_handler(request: Request, exc):
-    raise HTTPException(422, "validation error")

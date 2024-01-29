@@ -1,7 +1,6 @@
 from fastapi                 import FastAPI, Depends
 from fastapi.staticfiles     import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.exceptions      import RequestValidationError
 from src.auth.jwt_bearer     import JwtBearer
 from src.home                import router as home_router
 from src.routers.user        import router as user_router
@@ -25,7 +24,6 @@ app.mount(path="/images",    app=StaticFiles(directory="static"),    name="stati
 app.mount(path="/templates", app=StaticFiles(directory="templates"), name="templates")
 app.add_middleware(middleware_class=CORSMiddleware, allow_origins=ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 app.add_middleware(LogMiddleware)
-app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 app.include_router(home_router,                                tags=["Home"])
 app.include_router(user_router,     prefix="/api/v1/user",     tags=["User"])
@@ -35,16 +33,9 @@ app.include_router(content_router,  prefix="/api/v1/content",  tags=["Content"],
 app.include_router(image_router,    prefix="/api/v1/upload",   tags=["Image"],    dependencies=[Depends(JwtBearer())])
 app.include_router(logs_router,     prefix="/api/v1/logs",     tags=["Logs"],     dependencies=[Depends(JwtBearer())])
 
-# @app.exception_handler(RequestValidationError)
-# def validation_exception_handler(request: Request, exc):
-#     raise HTTPException(422, "Validation error")
 
-# @app.middleware("http")
-# async def get_request_url(request: Request, call_next):
-#     url = str(request.url).replace(URL, '')
-#     print(f"{request.method} {url}")
-#     response = await call_next(request)
-#     return response
+# from fastapi.exceptions      import RequestValidationError
+# app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # dependencies=[Depends(JwtBearer())]
 # pip install -r requirements.txt

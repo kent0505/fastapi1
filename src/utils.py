@@ -61,3 +61,5 @@ def log(msg: str):
         logging.error(msg)
 
 
+# def validation_exception_handler(request: Request, exc):
+#     raise HTTPException(422, "validation error")
