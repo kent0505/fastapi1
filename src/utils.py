@@ -55,7 +55,9 @@ def check_password(password1: str, password2: str):
 
 
 def log(msg: str):
-    if "GET 200" in msg:
+    if "200 OK" in msg:
         logging.info(msg)
-    elif "GET 404" in msg:
+    else:
         logging.error(msg)
+
+

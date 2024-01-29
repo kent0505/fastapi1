@@ -1,10 +1,10 @@
 from fastapi                import APIRouter, Request, HTTPException, Depends
 from fastapi.templating     import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.database           import get_db
-from app.utils              import *
-from app.config             import *
-import app.crud as crud
+from src.database           import get_db
+from src.utils              import formatted_date
+from src.config             import *
+import src.crud             as crud
 import markdown
 
 
@@ -18,18 +18,17 @@ async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
 
     categories = await crud.get_all_categories(db)
 
-    log("GET 200 /")
     return templates.TemplateResponse("index.html", {
         "request":    request,
         "title":      "Категории",
         "index":      1,
-        "url":        URL,
+        "url":        request.base_url,
         "categories": categories,
     })
 
 
 @router.get("/{category}")
-async def blogs_page(request: Request, category: str, db: AsyncSession = Depends(get_db)):
+async def blog_page(request: Request, category: str, db: AsyncSession = Depends(get_db)):
     category = category.replace("-", " ")
 
     blogs = []
@@ -39,21 +38,19 @@ async def blogs_page(request: Request, category: str, db: AsyncSession = Depends
     if row:
         blogs = await crud.get_all_blogs_by_cid(db, row.id)
 
-        log(f"GET 200 /{category}/")
         return templates.TemplateResponse("index.html", {
             "request": request,
             "title":   category,
             "index":   2,
-            "url":     URL,
+            "url":     request.base_url,
             "blogs":   blogs,
         })
 
-    log(f"GET 404 /{category}/")
     raise HTTPException(404, "Not found")
 
 
 @router.get("/{category}/{blog}")
-async def blogs_page(request: Request, category: str, blog: int, db: AsyncSession = Depends(get_db)):
+async def content_page(request: Request, category: str, blog: int, db: AsyncSession = Depends(get_db)):
     category = category.replace("-", " ")
 
     contents = []
@@ -72,17 +69,15 @@ async def blogs_page(request: Request, category: str, blog: int, db: AsyncSessio
             if content.image == 0:
                 body += f"{content.title}<br><br>"
             else:
-                body += f"![]({URL}/images/{content.title})<br><br>"
+                body += f"![]({request.base_url}images/{content.title}/)<br><br>"
 
-        log(f"GET 200 /{category}/{blog}/")
         return templates.TemplateResponse("index.html", {
             "request":  request,
             "title":    db_blog.title,
             "date":     date,
             "index":    3,
-            "url":      URL,
+            "url":      request.base_url,
             "contents": markdown.markdown(body),
         })
 
-    log(f"GET 404 /{category}/{blog}/")
     raise HTTPException(404, "Not found")

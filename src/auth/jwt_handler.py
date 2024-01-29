@@ -1,4 +1,4 @@
-from app.config import *
+from src.config import *
 import time
 import jwt
 

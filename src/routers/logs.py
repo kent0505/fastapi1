@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from app.utils import *
+from fastapi   import APIRouter
+from src.utils import *
 
 
 router = APIRouter()
