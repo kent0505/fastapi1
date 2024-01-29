@@ -1,8 +1,7 @@
 import logging
 
-HOST     = "localhost:8000" # change this
-# URL      = f"http://{HOST}" # change http to https
-KEY      = "" # add secret key for jwt
+HOST     = "localhost:8000"
+KEY      = ""
 ORIGINS  = [f"https://{HOST}", f"https://www.{HOST}"]
 DOCS_URL = "/docs"
 FILENAME = "logfile.log"
