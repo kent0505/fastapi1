@@ -2,10 +2,9 @@ from fastapi                import APIRouter, Request, HTTPException, Depends
 from fastapi.templating     import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database           import get_db
-from src.utils              import formatted_date
+from src.utils              import *
 from src.config             import *
 import src.crud             as crud
-import markdown
 
 
 router = APIRouter()
@@ -22,16 +21,13 @@ async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
         "request":    request,
         "title":      "Категории",
         "index":      1,
-        "url":        request.base_url,
         "categories": categories,
     })
 
 
 @router.get("/{category}")
 async def blog_page(request: Request, category: str, db: AsyncSession = Depends(get_db)):
-    category = category.replace("-", " ")
-
-    blogs = []
+    category = remove_dash(category)
 
     row = await crud.get_category_by_title(db, category)
 
@@ -42,7 +38,6 @@ async def blog_page(request: Request, category: str, db: AsyncSession = Depends(
             "request": request,
             "title":   category,
             "index":   2,
-            "url":     request.base_url,
             "blogs":   blogs,
         })
 
@@ -51,9 +46,7 @@ async def blog_page(request: Request, category: str, db: AsyncSession = Depends(
 
 @router.get("/{category}/{blog}")
 async def content_page(request: Request, category: str, blog: int, db: AsyncSession = Depends(get_db)):
-    category = category.replace("-", " ")
-
-    contents = []
+    category = remove_dash(category)
 
     db_category = await crud.get_category_by_title(db, category)
     db_blog     = await crud.get_blog_by_id(db, blog)
@@ -61,23 +54,15 @@ async def content_page(request: Request, category: str, blog: int, db: AsyncSess
     if db_category and db_blog:
         contents = await crud.get_all_contents_by_bid(db, db_blog.id)
 
-        date = formatted_date(db_blog.date)
-
-        body = ""
-
-        for content in contents:
-            if content.image == 0:
-                body += f"{content.title}<br><br>"
-            else:
-                body += f"![]({request.base_url}images/{content.title}/)<br><br>"
+        date = format_date(db_blog.date)
+        body = create_body(request, contents)
 
         return templates.TemplateResponse("index.html", {
-            "request":  request,
-            "title":    db_blog.title,
-            "date":     date,
-            "index":    3,
-            "url":      request.base_url,
-            "contents": markdown.markdown(body),
+            "request": request,
+            "title":   db_blog.title,
+            "date":    date,
+            "index":   3,
+            "body":    body,
         })
 
     raise HTTPException(404, "Not found")

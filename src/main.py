@@ -1,6 +1,7 @@
 from fastapi                 import FastAPI, Depends
 from fastapi.staticfiles     import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from src.utils               import LogMiddleware, init
 from src.auth.jwt_bearer     import JwtBearer
 from src.home                import router as home_router
 from src.routers.user        import router as user_router
@@ -9,14 +10,9 @@ from src.routers.blog        import router as blog_router
 from src.routers.content     import router as content_router
 from src.routers.image       import router as image_router
 from src.routers.logs        import router as logs_router
-from src.middleware.log      import *
 from src.config              import *
-import logging
-import os
 
-
-os.makedirs("static", exist_ok=True)
-logging.basicConfig(filename=FILENAME, level=LEVEL, format=FORMAT, datefmt=DATEFMT)
+init()
 
 app = FastAPI(docs_url=DOCS_URL, redoc_url=None)
 
