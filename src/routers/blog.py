@@ -10,7 +10,9 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_blogs(db: AsyncSession = Depends(get_db)):
+async def get_blogs(
+    db: AsyncSession = Depends(get_db)
+):
     blogList = []
 
     blogs = await crud.get_all_blogs(db)
@@ -28,7 +30,10 @@ async def get_blogs(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/")
-async def add_blog(blog: BlogAdd, db: AsyncSession = Depends(get_db)):
+async def add_blog(
+    blog: BlogAdd, 
+    db:   AsyncSession = Depends(get_db)
+):
     row = await crud.get_blog_by_cid(db, blog.cid)
 
     if row:
@@ -40,7 +45,10 @@ async def add_blog(blog: BlogAdd, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/")
-async def update_blog(blog: BlogUpdate, db: AsyncSession = Depends(get_db)):
+async def update_blog(
+    blog: BlogUpdate, 
+    db:   AsyncSession = Depends(get_db)
+):
     row = await crud.get_blog_by_id(db, blog.id)
 
     if row:
@@ -52,7 +60,10 @@ async def update_blog(blog: BlogUpdate, db: AsyncSession = Depends(get_db)):
 
 
 @router.delete("/{id}")
-async def delete_blog(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_blog(
+    id: int, 
+    db: AsyncSession = Depends(get_db)
+):
     row = await crud.get_blog_by_id(db, id)
 
     if row:

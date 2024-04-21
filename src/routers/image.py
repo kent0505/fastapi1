@@ -11,12 +11,11 @@ router = APIRouter()
 
 @router.post("/")
 async def upload_file(
-        file:  UploadFile, 
-        index: int = Form(), 
-        bid:   int = Form(), 
-        db:    AsyncSession = Depends(get_db),
-    ):
-
+    file:  UploadFile, 
+    index: int = Form(), 
+    bid:   int = Form(), 
+    db:    AsyncSession = Depends(get_db),
+):
     if file.filename and file.content_type.startswith("image/"):
         row = await crud.get_content_by_bid(db, bid)
 
@@ -34,12 +33,11 @@ async def upload_file(
 
 @router.put("/")
 async def update_file(
-        file:  UploadFile, 
-        id:    int = Form(), 
-        index: int = Form(), 
-        db:    AsyncSession = Depends(get_db)
-    ):
-
+    file:  UploadFile, 
+    id:    int = Form(), 
+    index: int = Form(), 
+    db:    AsyncSession = Depends(get_db)
+):
     if file.filename and file.content_type.startswith("image/"):
         row = await crud.get_content_by_id(db, id)
 

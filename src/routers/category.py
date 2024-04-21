@@ -10,7 +10,9 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_categories(db: AsyncSession = Depends(get_db)):
+async def get_categories(
+    db: AsyncSession = Depends(get_db)
+):
     categoriesList = []
 
     categories = await crud.get_all_categories(db)
@@ -27,14 +29,20 @@ async def get_categories(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/")
-async def add_category(category: CategoryAdd, db: AsyncSession = Depends(get_db)):
+async def add_category(
+    category: CategoryAdd, 
+    db:       AsyncSession = Depends(get_db)
+):
     await crud.add_category(db, category)
 
     return {"message": "category added"}
 
 
 @router.put("/")
-async def update_category(category: CategoryUpdate, db: AsyncSession = Depends(get_db)):
+async def update_category(
+    category: CategoryUpdate, 
+    db:       AsyncSession = Depends(get_db)
+):
     row = await crud.get_category_by_id(db, category.id)
 
     if row:
@@ -46,7 +54,10 @@ async def update_category(category: CategoryUpdate, db: AsyncSession = Depends(g
 
 
 @router.delete("/{id}")
-async def delete_category(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_category(
+    id: int, 
+    db: AsyncSession = Depends(get_db)
+):
     row = await crud.get_category_by_id(db, id)
 
     if row:

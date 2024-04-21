@@ -10,7 +10,10 @@ router = APIRouter()
 
 
 @router.get("/{bid}")
-async def get_contents(bid: int, db: AsyncSession = Depends(get_db)):
+async def get_contents(
+    bid: int, 
+    db:  AsyncSession = Depends(get_db)
+):
     contentList = []
 
     if bid == 0:
@@ -31,7 +34,10 @@ async def get_contents(bid: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/")
-async def add_content(content: ContentAdd, db: AsyncSession = Depends(get_db)):
+async def add_content(
+    content: ContentAdd, 
+    db:      AsyncSession = Depends(get_db)
+):
     row = await crud.get_content_by_bid(db, content.bid)
 
     if row:
@@ -43,7 +49,10 @@ async def add_content(content: ContentAdd, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/")
-async def update_content(content: ContentUpdate, db: AsyncSession = Depends(get_db)):
+async def update_content(
+    content: ContentUpdate, 
+    db:      AsyncSession = Depends(get_db)
+):
     row = await crud.get_content_by_id(db, content.id)
 
     if row:
@@ -55,7 +64,10 @@ async def update_content(content: ContentUpdate, db: AsyncSession = Depends(get_
     
 
 @router.delete("/{id}")
-async def delete_content(id: int, db: AsyncSession = Depends(get_db)):
+async def delete_content(
+    id: int, 
+    db: AsyncSession = Depends(get_db)
+):
     row = await crud.get_content_by_id(db, id)
 
     if row:

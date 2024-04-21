@@ -12,7 +12,10 @@ templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/")
-async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
+async def home_page(
+    request: Request, 
+    db:      AsyncSession = Depends(get_db)
+):
     categories = []
 
     categories = await crud.get_all_categories(db)
@@ -27,7 +30,11 @@ async def home_page(request: Request, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/{category}")
-async def blog_page(request: Request, category: str, db: AsyncSession = Depends(get_db)):
+async def blog_page(
+    request:  Request, 
+    category: str, 
+    db:       AsyncSession = Depends(get_db)
+):
     category = remove_dash(category)
 
     row = await crud.get_category_by_title(db, category)
@@ -47,7 +54,12 @@ async def blog_page(request: Request, category: str, db: AsyncSession = Depends(
 
 
 @router.get("/{category}/{blog}")
-async def content_page(request: Request, category: str, blog: int, db: AsyncSession = Depends(get_db)):
+async def content_page(
+    request:  Request, 
+    category: str, 
+    blog:     int, 
+    db:       AsyncSession = Depends(get_db)
+):
     category = remove_dash(category)
 
     db_category = await crud.get_category_by_title(db, category)

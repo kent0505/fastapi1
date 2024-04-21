@@ -47,8 +47,10 @@ async def register(user: UserModel, db: AsyncSession = Depends(get_db)):
 @router.put("/", dependencies=[Depends(JwtBearer())])
 async def update_user(user: UserUpdateModel, db: AsyncSession = Depends(get_db)):
     row = await crud.get_user_by_username(db, user.username)
+    if row == None:
+        raise HTTPException(404, "user not found")
 
-    if row and user.new_username != "" or user.new_password != "":
+    if user.new_username != "" or user.new_password != "":
         hashed = check_password(user.password, row.password)
 
         if hashed:
