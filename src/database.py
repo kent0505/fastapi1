@@ -25,6 +25,7 @@ class User(Base):
     id:       Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
     password: Mapped[str] = mapped_column(nullable=False)
+    fcmtoken: Mapped[str] = mapped_column(nullable=False)
 
 
 class Category(Base):

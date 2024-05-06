@@ -186,6 +186,7 @@ async def add_user(db: AsyncSession, user: UserModel):
     db.add(User(
         username=user.username, 
         password=user.password,
+        fcmtoken=user.fcmtoken,
     ))
     await db.commit()
 
@@ -193,6 +194,11 @@ async def add_user(db: AsyncSession, user: UserModel):
 async def update_user(db: AsyncSession, row: User, user: UserUpdateModel):
     row.username = user.new_username
     row.password = user.new_password
+    row.fcmtoken = user.fcmtoken
+    await db.commit()
+
+async def update_fcmtoken(db: AsyncSession, row: User, user: UserModel):
+    row.fcmtoken = user.fcmtoken
     await db.commit()
 
 

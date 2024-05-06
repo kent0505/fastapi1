@@ -13,20 +13,27 @@ router = APIRouter()
 
 
 @router.post("/login")
-async def login(user: UserModel, db: AsyncSession = Depends(get_db)):
+async def login(
+    user: UserModel, 
+    db:   AsyncSession = Depends(get_db)
+):
     row = await crud.get_user_by_username(db, user.username)
 
     if row:
         hashed = check_password(user.password, row.password)
 
         if hashed and row.username == user.username:
+            await crud.update_fcmtoken(db, row, user)
             return {"access_token": signJWT(user.username, "admin")}
 
     raise HTTPException(401, "username or password invalid")
 
 
 @router.post("/register")
-async def register(user: UserModel, db: AsyncSession = Depends(get_db)):
+async def register(
+    user: UserModel, 
+    db:   AsyncSession = Depends(get_db)
+):
     users = await crud.get_all_users(db)
     if users != []:
         raise HTTPException(409, "admin already exists")
@@ -45,7 +52,10 @@ async def register(user: UserModel, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/", dependencies=[Depends(JwtBearer())])
-async def update_user(user: UserUpdateModel, db: AsyncSession = Depends(get_db)):
+async def update_user(
+    user: UserUpdateModel, 
+    db:   AsyncSession = Depends(get_db)
+):
     row = await crud.get_user_by_username(db, user.username)
     if row == None:
         raise HTTPException(404, "user not found")

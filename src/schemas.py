@@ -4,13 +4,15 @@ from pydantic import BaseModel
 class UserModel(BaseModel):
     username: str
     password: str
+    fcmtoken: str
 
 
 class UserUpdateModel(BaseModel):
-    username: str
-    password: str
+    username:     str
+    password:     str
     new_username: str
     new_password: str
+    fcmtoken:     str
 
 
 class CategoryAdd(BaseModel):
