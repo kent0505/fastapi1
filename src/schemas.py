@@ -1,6 +1,12 @@
 from pydantic import BaseModel
 
 
+class NotificationModel(BaseModel):
+    username: str
+    title:    str
+    body:     str
+
+
 class UserModel(BaseModel):
     username: str
     password: str
