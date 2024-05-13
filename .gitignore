@@ -3,3 +3,4 @@ venv/
 static/*
 sqlite.db
 logfile.log
+firebase.json
