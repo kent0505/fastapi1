@@ -7,7 +7,6 @@ import src.crud             as crud
 import firebase_admin
 
 
-
 firebase_cred = credentials.Certificate("firebase.json")
 firebase_app = firebase_admin.initialize_app(firebase_cred)
 
@@ -19,16 +18,21 @@ async def send_notification(
     model: NotificationModel, 
     db:    AsyncSession = Depends(get_db)
 ):
-    row = await crud.get_user_by_username(db, model.username)
-    if row == None:
-        raise HTTPException(404, "user not found")
+    tokens = []
+
+    users = await crud.get_all_users(db)
+    for user in users:
+        tokens.append(user.fcmtoken)
+
+    print(tokens)
 
     message = messaging.MulticastMessage(
         notification=messaging.Notification(
             title = model.title,
             body  = model.body,
         ),
-        tokens=[row.fcmtoken]
+        tokens=tokens
     )
     messaging.send_multicast(message)
+
     return {"message": "notification sent"}

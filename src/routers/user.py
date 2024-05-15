@@ -23,7 +23,8 @@ async def login(
         hashed = check_password(user.password, row.password)
 
         if hashed and row.username == user.username:
-            await crud.update_fcmtoken(db, row, user)
+            if user.fcmtoken != "":
+                await crud.update_fcmtoken(db, row, user)
 
             access_token = signJWT(user.username, "admin")
 
