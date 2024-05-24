@@ -51,25 +51,25 @@ async def lifespan(app: FastAPI):
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
-    
+
     # shutdown
     logging.info("SHUTDOWN")
     await db_helper.dispose()
 
 
-def get_current_timestamp():
+def get_current_timestamp() -> int:
    return int(time.time())
 
 
-def format_date(timestamp: int):
+def format_date(timestamp: int) -> str:
     return datetime.fromtimestamp(timestamp).strftime(settings.date_format)
 
 
-def remove_dash(data: str):
+def remove_dash(data: str) -> str:
     return data.replace("-", " ")
 
 
-def create_body(contents: List[Content]):
+def create_body(contents: List[Content]) -> str:
     body = ""
     for content in contents:
         if content.image == 0:
@@ -85,9 +85,9 @@ def check_picked_file(file:  UploadFile) -> bool:
         return True
     else:
         return False
- 
 
-def remove_image(title: str):
+
+def remove_image(title: str) -> None:
     try:
         os.remove(f"{settings.static}/{title}")
         logging.warning("IMAGE REMOVED")
@@ -114,7 +114,7 @@ def add_image(file: UploadFile) -> str:
             logging.warning("IMAGE NOT ADDED")
             return ""
 
-    
+
 def check_firebase_file() -> bool:
     if os.path.exists(settings.firebase_json):
         try:
