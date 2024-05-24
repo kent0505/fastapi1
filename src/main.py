@@ -1,41 +1,36 @@
-from fastapi                  import FastAPI, Depends
-from fastapi.staticfiles      import StaticFiles
-from fastapi.middleware.cors  import CORSMiddleware
-from src.utils                import LogMiddleware, init
-from src.auth.jwt_bearer      import JwtBearer
-from src.home                 import router as home_router
-from src.routers.user         import router as user_router
-from src.routers.notification import router as notification_router
-from src.routers.category     import router as category_router
-from src.routers.blog         import router as blog_router
-from src.routers.content      import router as content_router
-from src.routers.image        import router as image_router
-from src.routers.logs         import router as logs_router
-from src.config               import *
+from fastapi                 import FastAPI
+from fastapi.responses       import ORJSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles     import StaticFiles
+from src.core.utils          import LogMiddleware, lifespan
+from src.core.config         import settings
+from src.api                 import router as api_router
 
-init()
 
-app = FastAPI(docs_url=DOCS_URL, redoc_url=None)
-
-app.mount(path="/images",    app=StaticFiles(directory="static"),    name="static")
-app.mount(path="/templates", app=StaticFiles(directory="templates"), name="templates")
-app.add_middleware(middleware_class=CORSMiddleware, allow_origins=ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app = FastAPI(
+    lifespan               = lifespan,
+    default_response_class = ORJSONResponse, 
+    swagger_ui_parameters  = settings.swagger_ui,
+)
 app.add_middleware(LogMiddleware)
+app.add_middleware(
+    middleware_class  = CORSMiddleware, 
+    allow_origins     = settings.allow_origins, 
+    allow_credentials = settings.allow_creds, 
+    allow_methods     = settings.allow_methods, 
+    allow_headers     = settings.allow_headers,
+)
+app.mount(
+    app  = StaticFiles(directory=settings.static),
+    path = settings.static_path,
+)
+app.mount(
+    app  = StaticFiles(directory=settings.templates),
+    path = settings.templates_path,
+)
+app.include_router(api_router)
 
-app.include_router(home_router,                                    tags=["Home"])
-app.include_router(user_router,         prefix="/api/v1/user",     tags=["User"])
-app.include_router(notification_router, prefix="/api/v1/firebase", tags=["Notification"], dependencies=[Depends(JwtBearer())])
-app.include_router(category_router,     prefix="/api/v1/category", tags=["Category"],     dependencies=[Depends(JwtBearer())])
-app.include_router(blog_router,         prefix="/api/v1/blog",     tags=["Blog"],         dependencies=[Depends(JwtBearer())])
-app.include_router(content_router,      prefix="/api/v1/content",  tags=["Content"],      dependencies=[Depends(JwtBearer())])
-app.include_router(image_router,        prefix="/api/v1/upload",   tags=["Image"],        dependencies=[Depends(JwtBearer())])
-app.include_router(logs_router,         prefix="/api/v1/logs",     tags=["Logs"],         dependencies=[Depends(JwtBearer())])
 
-
-# from fastapi.exceptions      import RequestValidationError
-# app.add_exception_handler(RequestValidationError, validation_exception_handler)
-
-# dependencies=[Depends(JwtBearer())]
 # pip install -r requirements.txt
 # cd Desktop/admin/test2 && source venv/bin/activate
 # uvicorn src.main:app --reload
