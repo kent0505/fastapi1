@@ -1,5 +1,7 @@
 from fastapi            import APIRouter, Request, HTTPException, Depends
 from fastapi.templating import Jinja2Templates
+from slowapi            import Limiter
+from slowapi.util       import get_remote_address
 from src.core.config    import settings
 from src.core.utils     import *
 from src.core.models    import *
@@ -7,6 +9,7 @@ from src.core.models    import *
 
 router = APIRouter()
 templates = Jinja2Templates(directory=settings.templates)
+limiter = Limiter(key_func=get_remote_address)
 
 
 async def db_get_all_categories(db: AsyncSession) -> List[Category]:
@@ -30,6 +33,7 @@ async def db_get_all_contents_by_bid(db: AsyncSession, bid: int) -> List[Content
 
 
 @router.get("/")
+@limiter.limit(settings.limit)
 async def home_page(
     request: Request, 
     db:      AsyncSession = Depends(db_helper.get_db)
@@ -48,6 +52,7 @@ async def home_page(
 
 
 @router.get("/{category}")
+@limiter.limit(settings.limit)
 async def blog_page(
     request:  Request, 
     category: str, 
@@ -72,6 +77,7 @@ async def blog_page(
 
 
 @router.get("/{title}/{id}")
+@limiter.limit(settings.limit)
 async def content_page(
     request: Request, 
     title:   str, 

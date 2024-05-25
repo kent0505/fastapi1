@@ -12,3 +12,4 @@ gunicorn
 firebase-admin
 pydantic-settings
 orjson
+slowapi

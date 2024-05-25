@@ -37,8 +37,8 @@ async def lifespan(app: FastAPI):
     # startup
     load_dotenv()
 
-    os.makedirs(".env",          exist_ok=True)
-    os.makedirs("firebase.json", exist_ok=True)
+    # os.makedirs(".env",          exist_ok=True)
+    # os.makedirs("firebase.json", exist_ok=True)
 
     logging.basicConfig(
         filename = settings.log_filename, 

@@ -50,5 +50,6 @@ async def send_notification(
             messaging.send_multicast(message)
 
             return {"message": "notification sent"}
-        except:
+        except Exception as e:
+            print(e)
             raise HTTPException(400, "firebase error")

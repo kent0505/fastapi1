@@ -32,8 +32,9 @@ class Settings(BaseModel):
     db_url:         str   = "sqlite+aiosqlite:///sqlite.db"
     db_echo:        bool  = False
     # others
-    date_format:    str   = "%d.%m.%Y"          # 29.01.2024
     firebase_json:  str   = "firebase.json"
-    swagger_ui:     dict  = {"defaultModelsExpandDepth": -1}
+    date_format:    str   = "%d.%m.%Y"                           # 29.01.2024
+    swagger_ui:     dict  = {"defaultModelsExpandDepth": -1}     # hide schemas from swagger
+    limit:          str   = os.getenv("LIMIT", "1") + "/seconds" # 1 request per 1 second
 
 settings = Settings()
