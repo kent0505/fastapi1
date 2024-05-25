@@ -1,6 +1,7 @@
-from fastapi         import APIRouter, HTTPException, Depends
+from fastapi         import APIRouter, HTTPException, Request, Depends
 from firebase_admin  import messaging
-from src.core.utils  import check_firebase_file
+from src.core.config import settings
+from src.core.utils  import check_firebase_file, limiter
 from src.core.models import *
 
 
@@ -18,9 +19,11 @@ async def db_get_all_users(db: AsyncSession) -> List[User]:
 
 
 @router.post("/send_notification")
+@limiter.limit(settings.limit)
 async def send_notification(
-    model: NotificationModel, 
-    db:    AsyncSession = Depends(db_helper.get_db)
+    request: Request, 
+    model:   NotificationModel, 
+    db:      AsyncSession = Depends(db_helper.get_db)
 ):  
     error = check_firebase_file()
     

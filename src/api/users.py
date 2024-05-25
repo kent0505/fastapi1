@@ -1,4 +1,6 @@
-from fastapi         import APIRouter, HTTPException, Depends
+from fastapi         import APIRouter, HTTPException, Request, Depends
+from src.core.utils  import limiter
+from src.core.config import settings
 from src.core.models import *
 from src.core.jwt    import *
 
@@ -51,9 +53,11 @@ async def db_delete_user(db: AsyncSession, user: User):
 
 
 @router.post("/login")
+@limiter.limit(settings.limit)
 async def login(
-    body: UserModel, 
-    db:   AsyncSession = Depends(db_helper.get_db)
+    request: Request, 
+    body:    UserModel, 
+    db:      AsyncSession = Depends(db_helper.get_db)
 ):
     user = await db_get_user_by_username(db, body.username)
 
@@ -74,9 +78,11 @@ async def login(
 
 
 @router.post("/register")
+@limiter.limit(settings.limit)
 async def register(
-    body: UserRegisterModel, 
-    db:   AsyncSession = Depends(db_helper.get_db)
+    request: Request, 
+    body:    UserRegisterModel, 
+    db:      AsyncSession = Depends(db_helper.get_db)
 ):
     users = await db_get_all_users(db)
     

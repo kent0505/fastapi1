@@ -1,5 +1,5 @@
-from fastapi         import APIRouter, UploadFile, HTTPException, Form, Depends
-from src.core.utils  import check_picked_file, add_image, remove_image
+from fastapi         import APIRouter, Request, UploadFile, HTTPException, Form, Depends
+from src.core.utils  import *
 from src.core.models import *
 
 
@@ -28,11 +28,13 @@ async def db_update_image(db: AsyncSession, content: Content, title: str, index:
 
 
 @router.post("/")
+@limiter.limit(settings.limit)
 async def upload_file(
-    file:  UploadFile, 
-    bid:   int = Form(), 
-    index: int = Form(default=0), 
-    db:    AsyncSession = Depends(db_helper.get_db),
+    request: Request, 
+    file:    UploadFile, 
+    bid:     int = Form(), 
+    index:   int = Form(default=0), 
+    db:      AsyncSession = Depends(db_helper.get_db),
 ):
     valid_file = check_picked_file(file)
 
@@ -52,11 +54,13 @@ async def upload_file(
 
 
 @router.put("/")
+@limiter.limit(settings.limit)
 async def update_file(
-    file:  UploadFile, 
-    id:    int = Form(), 
-    index: int = Form(default=0), 
-    db:    AsyncSession = Depends(db_helper.get_db)
+    request: Request, 
+    file:    UploadFile, 
+    id:      int = Form(), 
+    index:   int = Form(default=0), 
+    db:      AsyncSession = Depends(db_helper.get_db)
 ):
     valid_file = check_picked_file(file)
 

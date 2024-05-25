@@ -5,13 +5,18 @@ from contextlib                import asynccontextmanager
 from dotenv                    import load_dotenv
 from datetime                  import datetime
 from firebase_admin            import credentials
-from src.core.models           import db_helper, Base, Content, List
+from slowapi                   import Limiter
+from slowapi.util              import get_remote_address
 from src.core.config           import settings
+from src.core.models           import *
 import firebase_admin
 import markdown
 import logging
 import time
 import os
+
+
+limiter: Limiter = Limiter(key_func=get_remote_address)
 
 
 class LogMiddleware(BaseHTTPMiddleware):
