@@ -7,9 +7,6 @@ bcrypt
 jinja2
 python-multipart
 markdown
-pytest
 gunicorn
 firebase-admin
-pydantic-settings
-orjson
 slowapi

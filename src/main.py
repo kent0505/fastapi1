@@ -1,5 +1,4 @@
 from fastapi                 import FastAPI
-from fastapi.responses       import ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles     import StaticFiles
 from src.core.utils          import LogMiddleware, lifespan
@@ -9,7 +8,6 @@ from src.api                 import router as api_router
 
 app = FastAPI(
     lifespan               = lifespan,
-    default_response_class = ORJSONResponse, 
     swagger_ui_parameters  = settings.swagger_ui,
 )
 app.add_middleware(LogMiddleware)
@@ -32,6 +30,6 @@ app.include_router(api_router)
 
 
 # pip install -r requirements.txt
-# cd Desktop/admin/test2 && source venv/bin/activate
+# cd Desktop/backend/fastapi/blog && venv\Scripts\activate
 # uvicorn src.main:app --reload
 # sudo lsof -t -i tcp:8000 | xargs kill -9
