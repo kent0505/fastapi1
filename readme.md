@@ -1,8 +1,8 @@
-1) create .env file and add this\n
-PROTOCOL=https\n
-HOST=yourdomain.com\n
-KEY=yoursecretjwtkey\n
-LIMIT=1\n
+1) create .env file and add this\
+PROTOCOL=https\
+HOST=yourdomain.com\
+KEY=yoursecretjwtkey\
+LIMIT=1\
 
 2) virtualenv venv
 
