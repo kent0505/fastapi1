@@ -31,3 +31,12 @@ class Content(Base):
     index: Mapped[int] = mapped_column(nullable=False)
     image: Mapped[int] = mapped_column(nullable=False)
     bid:   Mapped[int] = mapped_column(nullable=False) # blog id
+
+
+class WordCategory(Base):
+    title: Mapped[str] = mapped_column(nullable=False)
+
+class Word(Base):
+    en:  Mapped[str] = mapped_column(nullable=False)
+    ru:  Mapped[str] = mapped_column(nullable=False)
+    cid: Mapped[int] = mapped_column(nullable=False) # word category id

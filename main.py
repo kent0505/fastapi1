@@ -30,6 +30,6 @@ app.include_router(api_router)
 
 
 # pip install -r requirements.txt
-# cd Desktop/backend/fastapi/blog && venv\Scripts\activate
+# cd Desktop/fullstack/blog && venv\Scripts\activate
 # uvicorn src.main:app --reload
 # sudo lsof -t -i tcp:8000 | xargs kill -9
