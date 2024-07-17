@@ -4,8 +4,7 @@ import os
 # import logging
 # import asyncio
 
-# bot = Bot(token=os.getenv("TOKEN", ""))
-bot = Bot(token="1752591343:AAHvNFb73A4amAZ5dOd2xPgalsPOYjAxFW4")
+bot = Bot(token=os.getenv("TOKEN", ""))
 dp = Dispatcher()
 
 
