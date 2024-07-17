@@ -10,3 +10,4 @@ markdown
 gunicorn
 firebase-admin
 slowapi
+aiogram==3.10.0
