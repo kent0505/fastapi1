@@ -36,5 +36,6 @@ class Settings(BaseModel):
     date_format:    str   = "%d.%m.%Y"                           # 29.01.2024
     swagger_ui:     dict  = {"defaultModelsExpandDepth": -1}     # hide schemas from swagger
     limit:          str   = os.getenv("LIMIT", "1") + "/seconds" # 1 request per 1 second
+    token:          str   = os.getenv("TOKEN", "")
 
 settings = Settings()
