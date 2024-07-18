@@ -9,7 +9,7 @@ from slowapi                   import Limiter
 from slowapi.util              import get_remote_address
 from src.core.config           import settings
 from src.core.models           import *
-# from src.bot.bot               import main
+from src.bot.bot               import main
 import firebase_admin
 import markdown
 import logging
@@ -54,7 +54,7 @@ async def lifespan(app: FastAPI):
     )
     logging.info("STARTUP")
 
-    # await main() # tg bot run
+    await main() # tg bot run
 
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
